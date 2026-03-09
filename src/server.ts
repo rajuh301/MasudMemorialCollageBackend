@@ -1,11 +1,36 @@
-import app from "./app";
-import config from "./config";
+// src/server.ts
+import { Server } from 'http';
+import app from './app';
+import config from './config';
 
-app.listen(config.port, () => {
-  console.log("Server running on port", config.port);
-});
+async function main() {
+    // Only start the server if not in Vercel environment
+    if (process.env.NODE_ENV !== 'production') {
+        const server: Server = app.listen(config.port, () => {
+            console.log("Server is running on port ", config.port);
+        });
 
-if (process.env.NODE_ENV !== "vercel") {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+        const exitHandler = () => {
+            if (server) {
+                server.close(() => {
+                    console.info("Server closed!");
+                });
+            }
+            process.exit(1);
+        };
+
+        process.on('uncaughtException', (error) => {
+            console.log(error);
+            exitHandler();
+        });
+
+        process.on('unhandledRejection', (error) => {
+            console.log(error);
+            exitHandler();
+        });
+    } else {
+        console.log("Running in production mode (Vercel)");
+    }
 }
+
+main();
