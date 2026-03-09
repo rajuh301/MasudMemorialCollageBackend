@@ -20,8 +20,9 @@ router.post(
     auth(
         UserRole.SUPER_ADMIN,
         UserRole.ADMIN,
-        UserRole.DOCTOR,
-        UserRole.PATIENT
+        UserRole.TEACHER,
+        UserRole.STUDENT,
+   
     ),
     AuthController.changePassword
 );

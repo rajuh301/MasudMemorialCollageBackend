@@ -2,12 +2,12 @@ import { Request, RequestHandler, Response } from "express";
 import { userService } from "./user.sevice";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
-import httpStatus from "http-status";
 import pick from "../../../shared/pick";
 import { userFilterableFields } from "./user.constant";
-import { UserRole } from "@prisma/client";
 import { JwtPayload } from "jsonwebtoken";
 import { IAuthUser } from "../../interfaces/common";
+import httpStatus = require("http-status");
+import { IAuthRequest } from "../../interfaces/type";
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
@@ -20,27 +20,21 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
     })
 });
 
-const createDoctor = catchAsync(async (req: Request, res: Response) => {
+const createTeacher = catchAsync(async (req: Request, res: Response) => {
+    // assert that req is IAuthRequest
+    const authReq = req as IAuthRequest;
 
-    const result = await userService.createDoctor(req);
+    const result = await userService.createTeacher(authReq);
+
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Doctor Created successfuly!",
+        message: "Teacher Created successfuly!",
         data: result
     })
 });
 
-const createPatient = catchAsync(async (req: Request, res: Response) => {
 
-    const result = await userService.createPatient(req);
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Patient Created successfuly!",
-        data: result
-    })
-});
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     // console.log(req.query)
@@ -102,10 +96,9 @@ const updateMyProfie = catchAsync(async (req: Request & { user?: IAuthUser }, re
 
 export const userController = {
     createAdmin,
-    createDoctor,
-    createPatient,
     getAllFromDB,
     changeProfileStatus,
     getMyProfile,
-    updateMyProfie
+    updateMyProfie,
+    createTeacher
 }

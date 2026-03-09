@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,11 +14,14 @@ model User {
   role               UserRole
   needPasswordChange Boolean    @default(true)
   status             UserStatus @default(ACTIVE)
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-  admin              Admin?
-  doctor             Doctor?
-  patient            Patient?
+  contactNumber      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  admin   Admin?
+  teacher Teacher?
+  student Student?
 
   @@map("users")
 }
@@ -39,228 +36,241 @@ model Admin {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  user User @relation(fields: [email], references: [email])
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdTeachers Teacher[] @relation("AdminToTeacher")
 
   @@map("admins")
 }
 
-model Doctor {
-  id                  String              @id @default(uuid())
-  name                String
-  email               String              @unique
-  profilePhoto        String?
-  contactNumber       String
-  address             String?
-  registrationNumber  String
-  experience          Int                 @default(0)
-  gender              Gender
-  appointmentFee      Int
-  qualification       String
-  currentWorkingPlace String
-  designation         String
-  isDeleted           Boolean             @default(false)
-  averageRating       Float               @default(0.0)
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
-  user                User                @relation(fields: [email], references: [email])
-  doctorSpecialties   DoctorSpecialties[]
-  doctorSchedules     DoctorSchedules[]
-  appointment         Appointment[]
-  prescription        Prescription[]
-  review              Review[]
-
-  @@map("doctors")
-}
-
-model Patient {
-  id            String   @id @unique @default(uuid())
-  email         String   @unique
+model Teacher {
+  id            String   @id @default(uuid())
   name          String
+  email         String   @unique
   profilePhoto  String?
-  contactNumber String?
-  address       String?
-  isDeleted     Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  contactNumber String
+  joiningDate   DateTime
+  address       String
 
-  user              User               @relation(references: [email], fields: [email])
-  patientHealthData PatientHealthData?
-  medicalReport     MedicalReport[]
-  appointment       Appointment[]
-  prescription      Prescription[]
-  review            Review[]
+  createdById String
+  createdBy   Admin? @relation("AdminToTeacher", fields: [createdById], references: [id])
 
-  @@map("patients")
-}
+  isDeleted Boolean @default(false)
 
-model Specialties {
-  id                String              @id @default(uuid())
-  title             String
-  icon              String
-  doctorSpecialties DoctorSpecialties[]
-
-  @@map("specialties")
-}
-
-model DoctorSpecialties {
-  specialitiesId String
-  specialities   Specialties @relation(fields: [specialitiesId], references: [id])
-
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-
-  @@id([specialitiesId, doctorId])
-  @@map("doctor_specialties")
-}
-
-model PatientHealthData {
-  id                  String        @id @default(uuid())
-  patientId           String        @unique
-  patient             Patient       @relation(fields: [patientId], references: [id])
-  gender              Gender
-  dateOfBirth         String
-  bloodGroup          BloodGroup
-  hasAllergies        Boolean?      @default(false)
-  hasDiabetes         Boolean?      @default(false)
-  height              String
-  weight              String
-  smokingStatus       Boolean?      @default(false)
-  dietaryPreferences  String?
-  pregnancyStatus     Boolean?      @default(false)
-  mentalHealthHistory String?
-  immunizationStatus  String?
-  hasPastSurgeries    Boolean?      @default(false)
-  recentAnxiety       Boolean?      @default(false)
-  recentDepression    Boolean?      @default(false)
-  maritalStatus       MaritalStatus @default(UNMARRIED)
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
-
-  @@map("patient_health_datas")
-}
-
-model MedicalReport {
-  id         String   @id @default(uuid())
-  patientId  String
-  patient    Patient  @relation(fields: [patientId], references: [id])
-  reportName String
-  reportLink String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@map("madical_reports")
-}
-
-model Schedule {
-  id              String            @id @default(uuid())
-  startDateTime   DateTime
-  endDateTime     DateTime
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  doctorSchedules DoctorSchedules[]
-  appointment     Appointment?
-
-  @@map("schedules")
-}
-
-model DoctorSchedules {
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-
-  scheduleId String
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
-
-  isBooked Boolean @default(false)
-
-  appointmentId String?      @unique
-  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
-
-  @@id([doctorId, scheduleId])
-  @@map("doctor_schedules")
-}
-
-model Appointment {
-  id        String  @id @default(uuid())
-  patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
-
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-
-  scheduleId String   @unique
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
-
-  videoCallingId  String
-  status          AppointmentStatus @default(SCHEDULED)
-  paymentStatus   PaymentStatus     @default(UNPAID)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  doctorSchedules DoctorSchedules?
-  payment         Payment?
-  prescription    Prescription?
-  review          Review?
-
-  @@map("appointments")
-}
-
-model Payment {
-  id            String      @id @default(uuid())
-  appointmentId String      @unique
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-
-  amount             Float
-  transactionId      String        @unique
-  status             PaymentStatus @default(UNPAID)
-  paymentGatewayData Json?
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
-
-  @@map("payments")
-}
-
-model Prescription {
-  id            String      @id @default(uuid())
-  appointmentId String      @unique
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-
-  patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
-
-  instructions String
-  followUpDate DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  @@map("prescriptions")
-}
-
-model Review {
-  id        String  @id @default(uuid())
-  patientId String
-  patient   Patient @relation(fields: [patientId], references: [id])
-
-  doctorId String
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-
-  appointmentId String      @unique
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-
-  rating    Float
-  comment   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("reviews")
+  createdStudents Student[] @relation("TeacherToStudent")
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("teachers")
+}
+
+model Student {
+  id           String  @id @default(uuid())
+  name         String
+  email        String  @unique
+  phone        String
+  profilePhoto String?
+  isDeleted    Boolean @default(false)
+
+  teacherCreatedById String?
+  teacherCreatedBy   Teacher? @relation("TeacherToStudent", fields: [teacherCreatedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  results Result[]
+
+  @@map("students")
+}
+
+model Result {
+  id           String @id @default(uuid())
+  studentId    String
+  departmentId String
+
+  marks Float
+  grade String
+
+  student    Student    @relation(fields: [studentId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Department {
+  id   String @id @default(uuid())
+  name String
+  year String
+
+  results          Result[]
+  StudentAdmission StudentAdmission[]
+}
+
+model StudentAdmission {
+  id               String        @id @default(uuid())
+  firstName        String
+  lastName         String
+  email            String?       @unique
+  phone            String
+  dateOfBirth      DateTime
+  gender           Gender
+  bloodGroup       BloodGroup
+  maritalStatus    MaritalStatus
+  presentAddress   String
+  permanentAddress String
+
+  guardianName     String
+  guardianPhone    String
+  guardianRelation String
+
+  previousSchool String
+  previousGPA    Float
+  passingYear    Int
+
+  departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  subjects String[]
+
+  admissionDate DateTime @default(now())
+
+  admissionFee  Float?
+  paymentStatus PaymentStatus @default(UNPAID)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  image     String?
+
+  @@map("student_admissions")
+}
+
+model Banner {
+  id String @id @default(uuid())
+
+  title       String
+  subTitle    String
+  description String
+  image       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isDeleted Boolean @default(false)
+
+  @@map("banners")
+}
+
+model SubBanner {
+  id String @id @default(uuid())
+
+  title       String
+  subTitle    String
+  description String
+  image       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subBanners")
+}
+
+model Notice {
+  id String @id @default(uuid())
+
+  title          String
+  description    String
+  isImportant    Boolean
+  isRecentNotice Boolean
+  date           DateTime
+
+  isDeleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("notices")
+}
+
+model Event {
+  id String @id @default(uuid())
+
+  title       String
+  description String
+  location    String
+  date        DateTime
+  image       String?
+
+  isDeleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("events")
+}
+
+model StudentsComment {
+  id String @id @default(uuid())
+
+  name        String
+  description String
+  batch       String
+  image       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("studentsComments")
+}
+
+model OurTeachers {
+  id String @id @default(uuid())
+
+  name        String
+  position    String
+  subject     String
+  description String
+  rating      String
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  image       String?
+
+  @@map("ourTeachers")
+}
+
+model Contact {
+  id String @id @default(uuid())
+
+  name    String
+  email   String
+  comment String
+
+  phone String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contacts")
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
 }
 
 enum UserRole {
   SUPER_ADMIN
   ADMIN
-  DOCTOR
-  PATIENT
+  TEACHER
+  STUDENT
 }
 
 enum UserStatus {
@@ -288,16 +298,4 @@ enum BloodGroup {
 enum MaritalStatus {
   MARRIED
   UNMARRIED
-}
-
-enum AppointmentStatus {
-  SCHEDULED
-  INPROGRESS
-  COMPLETED
-  CANCELED
-}
-
-enum PaymentStatus {
-  PAID
-  UNPAID
 }

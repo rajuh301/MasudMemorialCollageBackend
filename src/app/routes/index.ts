@@ -2,16 +2,15 @@ import express from 'express';
 import { userRoutes } from '../modules/User/user.routes';
 import { AdminRoutes } from '../modules/Admin/admin.routes';
 import { AuthRoutes } from '../modules/Auth/auth.routes';
-import { SpecialtiesRoutes } from '../modules/Specialties/specialties.routes';
-import { DoctorRoutes } from '../modules/Doctor/doctor.routes';
-import { PatientRoutes } from '../modules/Patient/patient.route';
-import { ScheduleRoutes } from '../modules/Schedule/schedule.routes';
-import { DoctorScheduleRoutes } from '../modules/DoctorSchedule/doctorSchedule.routes';
-import { AppointmentRoutes } from '../modules/Appointment/appointment.routes';
-import { PaymentRoutes } from '../modules/Payment/payment.routes';
-import { PrescriptionRoutes } from '../modules/Prescription/prescription.routes';
-import { ReviewRoutes } from '../modules/Review/review.routes';
-import { MetaRoutes } from '../modules/Meta/meta.routes';
+import { BannerRoutes } from '../modules/Banner/banner.route';
+import { SubBannerRoutes } from '../modules/SubBanner/subbanner.route';
+import { NoticeRoutes } from '../modules/Notice/notice.route';
+import { EventRoutes } from '../modules/Event/event.route';
+import { StudentsCommentRoutes } from '../modules/studentsComment/studentsComment.route';
+import { OurTeachersRoutes } from '../modules/OurTeacher/ourTeachers.route';
+import { ContactRoutes } from '../modules/Contact/contact.route';
+import { StudentAdmissionRoutes } from '../modules/Student/studentAdmission.route';
+
 
 const router = express.Router();
 
@@ -28,46 +27,40 @@ const moduleRoutes = [
         path: '/auth',
         route: AuthRoutes
     },
+
     {
-        path: '/specialties',
-        route: SpecialtiesRoutes
+        path: '/banner',
+        route:BannerRoutes
     },
     {
-        path: '/doctor',
-        route: DoctorRoutes
+        path: '/sub-banner',
+        route: SubBannerRoutes
     },
     {
-        path: '/patient',
-        route: PatientRoutes
+        path: '/notice',
+        route: NoticeRoutes
     },
     {
-        path: '/schedule',
-        route: ScheduleRoutes
+        path: '/event',
+        route: EventRoutes
     },
     {
-        path: '/doctor-schedule',
-        route: DoctorScheduleRoutes
+        path: '/comment',
+        route: StudentsCommentRoutes
     },
     {
-        path: '/appointment',
-        route: AppointmentRoutes
+        path: '/ourteacher',
+        route: OurTeachersRoutes
     },
     {
-        path: '/payment',
-        route: PaymentRoutes
+        path: '/contact',
+        route: ContactRoutes
     },
     {
-        path: '/prescription',
-        route: PrescriptionRoutes
+        path: '/student',
+        route: StudentAdmissionRoutes
     },
-    {
-        path: '/review',
-        route: ReviewRoutes
-    },
-    {
-        path: '/meta',
-        route: MetaRoutes
-    }
+  
 ];
 
 moduleRoutes.forEach(route => router.use(route.path, route.route))

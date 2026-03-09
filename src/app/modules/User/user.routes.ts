@@ -16,13 +16,13 @@ router.get(
 
 router.get(
     '/me',
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT),
     userController.getMyProfile
 )
 
 router.post(
     "/create-admin",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+    // auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
         req.body = userValidation.createAdmin.parse(JSON.parse(req.body.data))
@@ -30,22 +30,14 @@ router.post(
     }
 );
 
+
 router.post(
-    "/create-doctor",
+    "/create-teacher",
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body = userValidation.createDoctor.parse(JSON.parse(req.body.data))
-        return userController.createDoctor(req, res, next)
-    }
-);
-
-router.post(
-    "/create-patient",
-    fileUploader.upload.single('file'),
-    (req: Request, res: Response, next: NextFunction) => {
-        req.body = userValidation.createPatient.parse(JSON.parse(req.body.data))
-        return userController.createPatient(req, res, next)
+        req.body = userValidation.createTeacher.parse(JSON.parse(req.body.data))
+        return userController.createTeacher(req, res, next)
     }
 );
 
@@ -58,7 +50,7 @@ router.patch(
 
 router.patch(
     "/update-my-profile",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
         req.body = JSON.parse(req.body.data)

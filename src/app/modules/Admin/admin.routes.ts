@@ -13,6 +13,12 @@ router.get(
     AdminController.getAllFromDB
 );
 
+router.post(
+    '/create-admin',
+    // auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+    AdminController.createAdminIntoDB
+);
+
 router.get(
     '/:id',
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),

@@ -18,58 +18,37 @@ const createAdmin = z.object({
     })
 });
 
-const createDoctor = z.object({
+
+const createTeacher = z.object({
     password: z.string({
-        required_error: "Password is required"
+        required_error: "Password is required",
     }),
-    doctor: z.object({
+
+    teacher: z.object({
         name: z.string({
-            required_error: "Name is required!"
+            required_error: "Name is required!",
         }),
-        email: z.string({
-            required_error: "Email is required!"
-        }),
+
+        email: z
+            .string({
+                required_error: "Email is required!",
+            })
+            .email(),
+
         contactNumber: z.string({
-            required_error: "Contact Number is required!"
+            required_error: "Contact Number is required!",
         }),
-        address: z.string().optional(),
-        registrationNumber: z.string({
-            required_error: "Reg number is required"
+
+        joiningDate: z.string({
+            required_error: "Joining Date is required!",
         }),
-        experience: z.number().optional(),
-        gender: z.enum([Gender.MALE, Gender.FEMALE]),
-        appointmentFee: z.number({
-            required_error: "appointment fee is required"
+
+        address: z.string({
+            required_error: "Address is required!",
         }),
-        qualification: z.string({
-            required_error: "quilification is required"
-        }),
-        currentWorkingPlace: z.string({
-            required_error: "Current working place is required!"
-        }),
-        designation: z.string({
-            required_error: "Designation is required!"
-        })
-    })
+    }),
 });
 
-const createPatient = z.object({
-    password: z.string(),
-    patient: z.object({
-        email: z.string({
-            required_error: "Email is required!"
-        }).email(),
-        name: z.string({
-            required_error: "Name is required!"
-        }),
-        contactNumber: z.string({
-            required_error: "Contact number is required!"
-        }),
-        address: z.string({
-            required_error: "Address is required"
-        })
-    })
-});
 
 const updateStatus = z.object({
     body: z.object({
@@ -79,7 +58,6 @@ const updateStatus = z.object({
 
 export const userValidation = {
     createAdmin,
-    createDoctor,
-    createPatient,
-    updateStatus
+    updateStatus,
+    createTeacher
 }

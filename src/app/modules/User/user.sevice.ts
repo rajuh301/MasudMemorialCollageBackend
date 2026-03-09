@@ -1,4 +1,4 @@
-import { Admin, Doctor, Patient, Prisma, User, UserRole, UserStatus } from "@prisma/client";
+import { Admin, Prisma, Teacher, User, UserRole, UserStatus } from "@prisma/client";
 import * as bcrypt from 'bcrypt'
 import prisma from "../../../shared/prisma";
 import { fileUploader } from "../../../helpars/fileUploader";
@@ -8,101 +8,101 @@ import { IPaginationOptions } from "../../interfaces/pagination";
 import { paginationHelper } from "../../../helpars/paginationHelper";
 import { userSearchAbleFields } from "./user.constant";
 import { IAuthUser } from "../../interfaces/common";
+import { IAuthRequest } from "../../interfaces/type";
 
 const createAdmin = async (req: Request): Promise<Admin> => {
-
     const file = req.file as IFile;
 
+    // upload image
     if (file) {
         const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-        req.body.admin.profilePhoto = uploadToCloudinary?.secure_url
+        req.body.admin.profilePhoto = uploadToCloudinary?.secure_url;
     }
 
-    const hashedPassword: string = await bcrypt.hash(req.body.password, 12)
-
-    const userData = {
-        email: req.body.admin.email,
-        password: hashedPassword,
-        role: UserRole.ADMIN
-    }
+    const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
     const result = await prisma.$transaction(async (transactionClient) => {
-        await transactionClient.user.create({
-            data: userData
+
+        // 1️⃣ create user
+        const createdUser = await transactionClient.user.create({
+            data: {
+                email: req.body.admin.email,
+                password: hashedPassword,
+                role: UserRole.ADMIN,
+                contactNumber: req.body.admin.contactNumber
+            }
         });
 
-        const createdAdminData = await transactionClient.admin.create({
-            data: req.body.admin
+        // 2️⃣ create admin
+        const createdAdmin = await transactionClient.admin.create({
+            data: {
+                name: req.body.admin.name,
+                email: req.body.admin.email,
+                contactNumber: req.body.admin.contactNumber,
+                profilePhoto: req.body.admin.profilePhoto,
+                userId: createdUser.id
+            }
         });
 
-        return createdAdminData;
+        return createdAdmin;
     });
 
     return result;
 };
 
-const createDoctor = async (req: Request): Promise<Doctor> => {
 
-    const file = req.file as IFile;
 
-    if (file) {
-        const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-        req.body.doctor.profilePhoto = uploadToCloudinary?.secure_url
-    }
 
-    const hashedPassword: string = await bcrypt.hash(req.body.password, 12)
+const createTeacher = async (req: IAuthRequest): Promise<Teacher> => {
+  const file = req.file as IFile;
 
-    const userData = {
-        email: req.body.doctor.email,
+  if (file) {
+    const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
+    req.body.teacher.profilePhoto = uploadToCloudinary?.secure_url;
+  }
+
+  const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
+
+  const adminId = req.user.id; 
+  console.log(adminId)
+
+  if (!adminId) throw new Error("Cannot create teacher: Admin not authenticated.");
+
+  const adminData = await prisma.admin.findUnique({
+    where: { userId: adminId }
+  });
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    const createdUser = await transactionClient.user.create({
+      data: {
+        email: req.body.teacher.email,
         password: hashedPassword,
-        role: UserRole.DOCTOR
-    }
-
-    const result = await prisma.$transaction(async (transactionClient) => {
-        await transactionClient.user.create({
-            data: userData
-        });
-
-        const createdDoctorData = await transactionClient.doctor.create({
-            data: req.body.doctor
-        });
-
-        return createdDoctorData;
+        role: UserRole.TEACHER,
+        contactNumber: req.body.teacher.contactNumber
+      }
     });
 
-    return result;
-};
-
-const createPatient = async (req: Request): Promise<Patient> => {
-    const file = req.file as IFile;
-
-    if (file) {
-        const uploadedProfileImage = await fileUploader.uploadToCloudinary(file);
-        req.body.patient.profilePhoto = uploadedProfileImage?.secure_url;
-    }
-
-    const hashedPassword: string = await bcrypt.hash(req.body.password, 12)
-
-    const userData = {
-        email: req.body.patient.email,
-        password: hashedPassword,
-        role: UserRole.PATIENT
-    }
-
-    const result = await prisma.$transaction(async (transactionClient) => {
-        await transactionClient.user.create({
-            data: userData
-        });
-
-        const createdPatientData = await transactionClient.patient.create({
-            data: req.body.patient
-        });
-
-        return createdPatientData;
+    const createdTeacher = await transactionClient.teacher.create({
+      data: {
+        name: req.body.teacher.name,
+        email: req.body.teacher.email,
+        contactNumber: req.body.teacher.contactNumber,
+        profilePhoto: req.body.teacher.profilePhoto,
+        joiningDate: new Date(req.body.teacher.joiningDate),
+        address: req.body.teacher.address,
+        createdById: adminId, // ✅ now always string
+        userId: createdUser.id
+      }
     });
 
-    return result;
+    return createdTeacher;
+  });
+
+  return result;
 };
+
+
+
 
 const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     const { page, limit, skip } = paginationHelper.calculatePagination(options);
@@ -152,8 +152,6 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
             createdAt: true,
             updatedAt: true,
             admin: true,
-            patient: true,
-            doctor: true
         }
     });
 
@@ -220,20 +218,6 @@ const getMyProfile = async (user: IAuthUser) => {
             }
         })
     }
-    else if (userInfo.role === UserRole.DOCTOR) {
-        profileInfo = await prisma.doctor.findUnique({
-            where: {
-                email: userInfo.email
-            }
-        })
-    }
-    else if (userInfo.role === UserRole.PATIENT) {
-        profileInfo = await prisma.patient.findUnique({
-            where: {
-                email: userInfo.email
-            }
-        })
-    }
 
     return { ...userInfo, ...profileInfo };
 };
@@ -271,22 +255,7 @@ const updateMyProfie = async (user: IAuthUser, req: Request) => {
             data: req.body
         })
     }
-    else if (userInfo.role === UserRole.DOCTOR) {
-        profileInfo = await prisma.doctor.update({
-            where: {
-                email: userInfo.email
-            },
-            data: req.body
-        })
-    }
-    else if (userInfo.role === UserRole.PATIENT) {
-        profileInfo = await prisma.patient.update({
-            where: {
-                email: userInfo.email
-            },
-            data: req.body
-        })
-    }
+
 
     return { ...profileInfo };
 }
@@ -294,10 +263,9 @@ const updateMyProfie = async (user: IAuthUser, req: Request) => {
 
 export const userService = {
     createAdmin,
-    createDoctor,
-    createPatient,
     getAllFromDB,
     changeProfileStatus,
     getMyProfile,
-    updateMyProfie
+    updateMyProfie,
+    createTeacher
 }

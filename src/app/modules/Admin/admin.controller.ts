@@ -36,6 +36,17 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
 })
 
 
+const createAdminIntoDB = catchAsync(async (req: Request, res: Response) => {
+    const result = await AdminService.createAdminIntoDB(req.body);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Admin data created!",
+        data: result
+    })
+})
+
+
 const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
 
@@ -78,5 +89,6 @@ export const AdminController = {
     getByIdFromDB,
     updateIntoDB,
     deleteFromDB,
-    softDeleteFromDB
+    softDeleteFromDB,
+    createAdminIntoDB
 }

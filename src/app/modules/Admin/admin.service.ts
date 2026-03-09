@@ -4,6 +4,8 @@ import { paginationHelper } from "../../../helpars/paginationHelper";
 import prisma from "../../../shared/prisma";
 import { IAdminFilterRequest } from "./admin.interface";
 import { IPaginationOptions } from "../../interfaces/pagination";
+import bcrypt from "bcrypt";
+
 
 const getAllFromDB = async (params: IAdminFilterRequest, options: IPaginationOptions) => {
     const { page, limit, skip } = paginationHelper.calculatePagination(options);
@@ -75,6 +77,34 @@ const getByIdFromDB = async (id: string): Promise<Admin | null> => {
 
     return result;
 };
+
+
+const createAdminIntoDB = async (payload: any): Promise<Admin> => {
+      const hashedPassword = await bcrypt.hash(payload.password, 10);
+
+    const result = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
+            data:{
+                email: payload.email,
+                password: hashedPassword,
+                contactNumber: payload.contactNumber,
+                role: "ADMIN"
+            }
+        });
+
+        const admin = await tx.admin.create({
+            data: {
+                name: payload.name,
+                email: payload.email,
+                contactNumber: payload.contactNumber,
+                userId: user.id 
+            }
+        });
+        return admin;
+    });
+    return result
+ 
+}
 
 const updateIntoDB = async (id: string, data: Partial<Admin>): Promise<Admin> => {
     await prisma.admin.findUniqueOrThrow({
@@ -161,5 +191,6 @@ export const AdminService = {
     getByIdFromDB,
     updateIntoDB,
     deleteFromDB,
-    softDeleteFromDB
+    softDeleteFromDB,
+    createAdminIntoDB
 }
