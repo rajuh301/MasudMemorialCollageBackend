@@ -2,11 +2,9 @@ import { Server } from 'http';
 import app from './app'
 import config from './config';
 
-
-
 async function main() {
     const server: Server = app.listen(config.port, () => {
-        console.log("Sever is running on port ", config.port);
+        console.log("Server running on port ", config.port);
     });
 
     const exitHandler = () => {
@@ -17,6 +15,7 @@ async function main() {
         }
         process.exit(1);
     };
+
     process.on('uncaughtException', (error) => {
         console.log(error);
         exitHandler();
@@ -28,4 +27,6 @@ async function main() {
     })
 };
 
-main();
+if (process.env.NODE_ENV !== "production") {
+    main();
+}
