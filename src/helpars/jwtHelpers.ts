@@ -1,6 +1,11 @@
-import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
+import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
-const generateToken = (payload: any, secret: Secret, expiresIn: string) => {
+// Using SignOptions['expiresIn'] ensures the type matches the library's expectation
+const generateToken = (
+    payload: object, 
+    secret: Secret, 
+    expiresIn: SignOptions['expiresIn'] 
+) => {
     const token = jwt.sign(
         payload,
         secret,
@@ -14,10 +19,11 @@ const generateToken = (payload: any, secret: Secret, expiresIn: string) => {
 };
 
 const verifyToken = (token: string, secret: Secret) => {
+    // jwt.verify returns string | JwtPayload; casting ensures it meets your return type
     return jwt.verify(token, secret) as JwtPayload;
 }
 
 export const jwtHelpers = {
     generateToken,
     verifyToken
-}
+};

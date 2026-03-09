@@ -3,7 +3,7 @@ import { jwtHelpers } from "../../../helpars/jwtHelpers";
 import prisma from "../../../shared/prisma";
 import * as bcrypt from 'bcrypt'
 import config from "../../../config";
-import { Secret } from "jsonwebtoken";
+import { Secret, SignOptions } from "jsonwebtoken";
 import emailSender from "./emailSender";
 import ApiError from "../../errors/ApiError";
 import httpStatus from "http-status";
@@ -29,7 +29,7 @@ const loginUser = async (payload: {
         role: userData.role
     },
         config.jwt.jwt_secret as Secret,
-        config.jwt.expires_in as string
+        config.jwt.expires_in as unknown as SignOptions['expiresIn']
     );
 
     const refreshToken = jwtHelpers.generateToken({
@@ -37,7 +37,7 @@ const loginUser = async (payload: {
         role: userData.role
     },
         config.jwt.refresh_token_secret as Secret,
-        config.jwt.refresh_token_expires_in as string
+        config.jwt.refresh_token_expires_in as unknown as SignOptions['expiresIn']
     );
 
     return {
@@ -68,7 +68,7 @@ const refreshToken = async (token: string) => {
         role: userData.role
     },
         config.jwt.jwt_secret as Secret,
-        config.jwt.expires_in as string
+        config.jwt.expires_in as unknown as SignOptions['expiresIn']
     );
 
     return {
@@ -120,7 +120,7 @@ const forgotPassword = async (payload: { email: string }) => {
     const resetPassToken = jwtHelpers.generateToken(
         { email: userData.email, role: userData.role },
         config.jwt.reset_pass_secret as Secret,
-        config.jwt.reset_pass_token_expires_in as string
+        config.jwt.reset_pass_token_expires_in as unknown as SignOptions['expiresIn']
     )
     //console.log(resetPassToken)
 
