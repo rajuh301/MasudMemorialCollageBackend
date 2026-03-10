@@ -9,11 +9,10 @@ const allowedFields = ["name", "description", "batch", "image"];
 
 const createStudentsCommentIntoDB = async (req: Request) => {
 
-  const file = req.file as IFile;
+   const file = req.file as IFile;
 
   if (file) {
-    const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-    req.body.image = uploadToCloudinary?.secure_url;
+  req.body.image = file.path;
   }
 
   const result = await prisma.studentsComment.create({
