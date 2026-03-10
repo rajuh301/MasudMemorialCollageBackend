@@ -1,43 +1,40 @@
-import multer from "multer"
-import path from "path"
-import fs from 'fs'
-import { v2 as cloudinary } from 'cloudinary';
-import { ICloudinaryResponse, IFile } from "../app/interfaces/file";
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import streamifier from "streamifier";
+import config from "../config";
 
-
+// Cloudinary config
 cloudinary.config({
-    cloud_name: 'dbgrq28js',
-    api_key: '173484379744282',
-    api_secret: 'eHKsVTxIOLl5oaO_BHxBQWAK3GA'
+  cloud_name: config.cloudinary.cloud_name,
+  api_key: config.cloudinary.api_key,
+  api_secret: config.cloudinary.api_secret,
 });
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(process.cwd(), 'uploads'))
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname)
-    }
-})
+// ❗ Use memory instead of disk
+const storage = multer.memoryStorage();
 
-const upload = multer({ storage: storage })
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
+});
 
-const uploadToCloudinary = async (file: IFile): Promise<ICloudinaryResponse | undefined> => {
-    return new Promise((resolve, reject) => {
-        cloudinary.uploader.upload(file.path,
-            (error: Error, result: ICloudinaryResponse) => {
-                fs.unlinkSync(file.path)
-                if (error) {
-                    reject(error)
-                }
-                else {
-                    resolve(result)
-                }
-            })
-    })
+const uploadToCloudinary = async (file: Express.Multer.File) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "student-admission" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+
+    streamifier.createReadStream(file.buffer).pipe(stream);
+  });
 };
 
 export const fileUploader = {
-    upload,
-    uploadToCloudinary
-}
+  upload,
+  uploadToCloudinary,
+};
