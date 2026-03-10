@@ -11,21 +11,19 @@ router.post(
   "/create-student-admission",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   fileUploader.upload.single("file"),
-  (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Parse the data from form-data
+
       const data = req.body.data ? JSON.parse(req.body.data) : req.body;
-      
-      // Validate the data
+
       const validatedData = createStudentAdmissionValidation.parse(data);
-      
-      // Attach validated data to request body
+
       req.body = validatedData;
-      
-      // Call the controller
+
       return studentController.createStudentAdmission(req, res, next);
-    } catch (err) {
-      next(err);
+
+    } catch (error) {
+      next(error);
     }
   }
 );

@@ -4,7 +4,8 @@ import catchAsync from "../../../shared/catchAsync";
 import { StudentAdmissionService } from "./studentAdmission.service";
 import sendResponse from "../../../shared/sendResponse";
 
-export const createStudentAdmission = catchAsync(async (req: Request, res: Response) => {
+const createStudentAdmission = catchAsync(async (req: Request, res: Response) => {
+
   const result = await StudentAdmissionService.createStudentAdmissionIntoDB(req);
 
   sendResponse(res, {
@@ -13,8 +14,9 @@ export const createStudentAdmission = catchAsync(async (req: Request, res: Respo
     message: "Student admission created successfully",
     data: result,
   });
+
 });
 
 export const studentController = {
-  createStudentAdmission
+  createStudentAdmission,
 };
