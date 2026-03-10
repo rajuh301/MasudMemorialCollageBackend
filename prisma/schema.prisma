@@ -61,12 +61,25 @@ model Teacher {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  createdStudents Student[] @relation("TeacherToStudent")
-
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
+  createdStudents Student[]    @relation("TeacherToStudent")
+  attendances     Attendance[]
+  userId          String       @unique
+  user            User         @relation(fields: [userId], references: [id])
 
   @@map("teachers")
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  teacherId String
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  date      DateTime @default(now())
+  status    String   @default("PRESENT")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("attendances")
 }
 
 model Student {
