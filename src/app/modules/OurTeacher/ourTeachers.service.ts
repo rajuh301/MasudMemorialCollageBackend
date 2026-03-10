@@ -16,8 +16,7 @@ const createOurTeacherIntoDB = async (req: Request) => {
   const file = req.file as IFile;
 
   if (file) {
-    const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-    req.body.image = uploadToCloudinary?.secure_url;
+  req.body.image = file.path;
   }
 
   const result = await prisma.ourTeachers.create({

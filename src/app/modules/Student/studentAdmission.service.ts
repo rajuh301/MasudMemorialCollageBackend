@@ -5,16 +5,14 @@ import { IFile } from "../../interfaces/file";
 
 const createStudentAdmissionIntoDB = async (req: Request) => {
 
-  const file = req.file as IFile;
   const body = req.body;
 
   let imageUrl = body.image;
+  const file = req.file as IFile;
 
   if (file) {
-    const uploaded = await fileUploader.uploadToCloudinary(file);
-    imageUrl = uploaded?.secure_url;
+  req.body.image = file.path;
   }
-
   const result = await prisma.studentAdmission.create({
     data: {
       firstName: body.firstName,

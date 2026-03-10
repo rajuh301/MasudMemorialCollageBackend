@@ -7,13 +7,11 @@ import { IFile } from "../../interfaces/file";
 
 const createEventIntoDB = async (req: Request) => {
 
-  const file = req.file as IFile;
+   const file = req.file as IFile;
 
   if (file) {
-    const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-    req.body.image = uploadToCloudinary?.secure_url;
+  req.body.image = file.path;
   }
-
   const result = await prisma.event.create({
     data: {
       ...req.body,

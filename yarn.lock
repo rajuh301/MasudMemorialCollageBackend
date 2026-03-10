@@ -754,7 +754,7 @@ cjs-module-lexer@1.2.3:
   resolved "https://registry.npmjs.org/cjs-module-lexer/-/cjs-module-lexer-1.2.3.tgz"
   integrity sha512-0TNiGstbQmCFwt4akjjBg5pLRTSyj/PkWQ1ZoO2zntmg9yLqSRxwEa4iCfQLGjqhiqBfOJa7W/E8wfGrTDmlZQ==
 
-cloudinary@^2.0.3:
+cloudinary@^2.9.0:
   version "2.9.0"
   resolved "https://registry.npmjs.org/cloudinary/-/cloudinary-2.9.0.tgz"
   integrity sha512-F3iKMOy4y0zy0bi5JBp94SC7HY7i/ImfTPSUV07iJmRzH1Iz8WavFfOlJTR1zvYM/xKGoiGZ3my/zy64In0IQQ==

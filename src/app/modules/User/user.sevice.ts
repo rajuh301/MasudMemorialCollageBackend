@@ -11,13 +11,13 @@ import { IAuthUser } from "../../interfaces/common";
 import { IAuthRequest } from "../../interfaces/type";
 
 const createAdmin = async (req: Request): Promise<Admin> => {
-    const file = req.file as IFile;
 
     // upload image
-    if (file) {
-        const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-        req.body.admin.profilePhoto = uploadToCloudinary?.secure_url;
-    }
+  const file = req.file as IFile;
+
+  if (file) {
+  req.body.image = file.path;
+  }
 
     const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
@@ -57,8 +57,7 @@ const createTeacher = async (req: IAuthRequest): Promise<Teacher> => {
   const file = req.file as IFile;
 
   if (file) {
-    const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-    req.body.teacher.profilePhoto = uploadToCloudinary?.secure_url;
+  req.body.image = file.path;
   }
 
   const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
@@ -230,11 +229,11 @@ const updateMyProfie = async (user: IAuthUser, req: Request) => {
         }
     });
 
-    const file = req.file as IFile;
-    if (file) {
-        const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
-        req.body.profilePhoto = uploadToCloudinary?.secure_url;
-    }
+  const file = req.file as IFile;
+
+  if (file) {
+  req.body.image = file.path;
+  }
 
     let profileInfo;
 
