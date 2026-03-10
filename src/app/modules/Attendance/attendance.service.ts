@@ -1,7 +1,8 @@
 import { Request } from "express";
 import prisma from "../../../shared/prisma";
 import httpStatus from "http-status";
-import ApiError from "src/app/errors/ApiError";
+
+import ApiError from "../../errors/ApiError"
 
 const createAttendanceIntoDB = async (req: Request) => {
   const { teacherId } = req.body;

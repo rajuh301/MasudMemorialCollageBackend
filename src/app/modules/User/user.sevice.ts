@@ -62,12 +62,19 @@ const createTeacher = async (req: IAuthRequest): Promise<Teacher> => {
 
   const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
-  const adminId = req.user.id; 
+  const adminEmail = req.user.email;
+  
+  const validAdmin = await prisma.admin.findUnique({
+    where:{
+        email:adminEmail
+    }
+  });
 
-  if (!adminId) throw new Error("Cannot create teacher: Admin not authenticated.");
+
+  if (!validAdmin) throw new Error("Cannot create teacher: Admin not authenticated.");
 
   const adminData = await prisma.admin.findUnique({
-    where: { userId: adminId }
+    where: { userId: validAdmin.id }
   });
 
   const result = await prisma.$transaction(async (transactionClient) => {
@@ -88,7 +95,7 @@ const createTeacher = async (req: IAuthRequest): Promise<Teacher> => {
         profilePhoto: req.body.teacher.profilePhoto,
         joiningDate: new Date(req.body.teacher.joiningDate),
         address: req.body.teacher.address,
-        createdById: adminId, // ✅ now always string
+        createdById: validAdmin.id, // ✅ now always string
         userId: createdUser.id
       }
     });
