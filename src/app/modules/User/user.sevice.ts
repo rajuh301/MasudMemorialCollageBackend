@@ -13,11 +13,11 @@ import { IAuthRequest } from "../../interfaces/type";
 const createAdmin = async (req: Request): Promise<Admin> => {
 
     // upload image
-  const file = req.file as IFile;
+    const file = req.file as IFile;
 
-  if (file) {
-  req.body.image = file.path;
-  }
+    if (file) {
+        req.body.image = file.path;
+    }
 
     const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
@@ -51,61 +51,59 @@ const createAdmin = async (req: Request): Promise<Admin> => {
 };
 
 
-
-
 const createTeacher = async (req: IAuthRequest): Promise<Teacher> => {
-  const file = req.file as IFile;
+    const file = req.file as IFile;
 
-  if (file) {
-  req.body.image = file.path;
-  }
-
-  const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
-
-  const adminEmail = req.user.email;
-  
-  const validAdmin = await prisma.admin.findUnique({
-    where:{
-        email:adminEmail
+    // ১. ইমেজ হ্যান্ডেলিং (ডাটাবেসে profilePhoto ফিল্ডে যাবে)
+    if (file) {
+        req.body.teacher.profilePhoto = file.path;
     }
-  });
 
+    const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
-  if (!validAdmin) throw new Error("Cannot create teacher: Admin not authenticated.");
-
-  const adminData = await prisma.admin.findUnique({
-    where: { userId: validAdmin.id }
-  });
-
-  const result = await prisma.$transaction(async (transactionClient) => {
-    const createdUser = await transactionClient.user.create({
-      data: {
-        email: req.body.teacher.email,
-        password: hashedPassword,
-        role: UserRole.TEACHER,
-        contactNumber: req.body.teacher.contactNumber
-      }
+    // ২. অ্যাডমিন ভ্যালিডেশন
+    const adminEmail = req.user.email;
+    const validAdmin = await prisma.admin.findUnique({
+        where: { email: adminEmail }
     });
 
-    const createdTeacher = await transactionClient.teacher.create({
-      data: {
-        name: req.body.teacher.name,
-        email: req.body.teacher.email,
-        contactNumber: req.body.teacher.contactNumber,
-        profilePhoto: req.body.teacher.profilePhoto,
-        joiningDate: new Date(req.body.teacher.joiningDate),
-        address: req.body.teacher.address,
-        createdById: validAdmin.id, // ✅ now always string
-        userId: createdUser.id
-      }
+    if (!validAdmin) {
+        throw new Error("Cannot create teacher: Admin profile not found.");
+    }
+
+    // ৩. ট্রানজেকশন শুরু
+    const result = await prisma.$transaction(async (transactionClient) => {
+
+        // User টেবিলে ডাটা সেভ (Login credentials)
+        const createdUser = await transactionClient.user.create({
+            data: {
+                email: req.body.teacher.email,
+                password: hashedPassword,
+                role: UserRole.TEACHER, // ✅ রোল সেট করা হলো
+                contactNumber: req.body.teacher.contactNumber,
+                status: UserStatus.ACTIVE
+            }
+        });
+
+        // Teacher টেবিলে প্রোফাইল ডাটা সেভ
+        const createdTeacher = await transactionClient.teacher.create({
+            data: {
+                name: req.body.teacher.name,
+                email: req.body.teacher.email,
+                contactNumber: req.body.teacher.contactNumber,
+                profilePhoto: req.body.teacher.profilePhoto || null, // ✅ ক্লাউডিনারি URL
+                joiningDate: new Date(req.body.teacher.joiningDate),
+                address: req.body.teacher.address,
+                createdById: validAdmin.id, // ✅ কোন এডমিন তৈরি করেছে তার আইডি
+                userId: createdUser.id      // ✅ User টেবিলের সাথে কানেকশন
+            }
+        });
+
+        return createdTeacher;
     });
 
-    return createdTeacher;
-  });
-
-  return result;
+    return result;
 };
-
 
 
 
@@ -236,11 +234,11 @@ const updateMyProfie = async (user: IAuthUser, req: Request) => {
         }
     });
 
-  const file = req.file as IFile;
+    const file = req.file as IFile;
 
-  if (file) {
-  req.body.image = file.path;
-  }
+    if (file) {
+        req.body.image = file.path;
+    }
 
     let profileInfo;
 
