@@ -64,7 +64,6 @@ const createTeacher = async (req: IAuthRequest): Promise<Teacher> => {
   const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
   const adminId = req.user.id; 
-  console.log(adminId)
 
   if (!adminId) throw new Error("Cannot create teacher: Admin not authenticated.");
 

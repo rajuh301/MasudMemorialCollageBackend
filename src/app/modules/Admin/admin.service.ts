@@ -13,7 +13,6 @@ const getAllFromDB = async (params: IAdminFilterRequest, options: IPaginationOpt
 
     const andCondions: Prisma.AdminWhereInput[] = [];
 
-    //console.log(filterData);
     if (params.searchTerm) {
         andCondions.push({
             OR: adminSearchAbleFields.map(field => ({

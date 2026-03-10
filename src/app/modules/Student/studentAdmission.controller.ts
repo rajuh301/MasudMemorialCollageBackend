@@ -16,5 +16,5 @@ export const createStudentAdmission = catchAsync(async (req: Request, res: Respo
 });
 
 export const studentController = {
-    createStudentAdmission
-}
+  createStudentAdmission
+};

@@ -2,46 +2,58 @@ import { Request } from "express";
 import { IFile } from "../../interfaces/file";
 import { fileUploader } from "../../../helpars/fileUploader";
 import prisma from "../../../shared/prisma";
-;
 
 export const createStudentAdmissionIntoDB = async (req: Request) => {
   const file = req.file as IFile;
+  const body = req.body;
 
+  let imageUrl = body.image;
+  
   if (file) {
     const uploaded = await fileUploader.uploadToCloudinary(file);
-    req.body.image = uploaded?.secure_url;
+    imageUrl = uploaded?.secure_url;
   }
 
-  // Only include email if provided (avoid Prisma unique null errors)
+  // Prepare the data for Prisma
   const data: any = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    phone: req.body.phone,
-    dateOfBirth: new Date(req.body.dateOfBirth),
-    gender: req.body.gender,
-    bloodGroup: req.body.bloodGroup,
-    maritalStatus: req.body.maritalStatus,
-    presentAddress: req.body.presentAddress,
-    permanentAddress: req.body.permanentAddress,
-    guardianName: req.body.guardianName,
-    guardianPhone: req.body.guardianPhone,
-    guardianRelation: req.body.guardianRelation,
-    previousSchool: req.body.previousSchool,
-    previousGPA: req.body.previousGPA,
-    passingYear: req.body.passingYear,
-    subjects: req.body.subjects,
-    admissionFee: req.body.admissionFee,
-    paymentStatus: req.body.paymentStatus,
-    image: req.body.image,
-    department: { connect: { id: req.body.departmentId } }
+    firstName: body.firstName,
+    lastName: body.lastName,
+    phone: body.phone,
+    dateOfBirth: new Date(body.dateOfBirth),
+    gender: body.gender,
+    bloodGroup: body.bloodGroup,
+    maritalStatus: body.maritalStatus,
+    presentAddress: body.presentAddress,
+    permanentAddress: body.permanentAddress,
+    guardianName: body.guardianName,
+    guardianPhone: body.guardianPhone,
+    guardianRelation: body.guardianRelation,
+    previousSchool: body.previousSchool,
+    previousGPA: body.previousGPA ? parseFloat(body.previousGPA) : null,
+    passingYear: body.passingYear ? parseInt(body.passingYear) : null,
+    subjects: Array.isArray(body.subjects) ? body.subjects : JSON.parse(body.subjects || '[]'),
+    admissionFee: body.admissionFee ? parseFloat(body.admissionFee) : null,
+    paymentStatus: body.paymentStatus || "UNPAID",
+    image: imageUrl,
+    department: {
+      connect: { id: body.departmentId }
+    }
   };
 
-  if (req.body.email) data.email = req.body.email;
+  // Add email if provided
+  if (body.email) {
+    data.email = body.email;
+  }
 
-  const result = await prisma.studentAdmission.create({ data });
+  const result = await prisma.studentAdmission.create({
+    data,
+    include: {
+      department: true
+    }
+  });
+  
   return result;
 };
-
 
 export const StudentAdmissionService = {
   createStudentAdmissionIntoDB
