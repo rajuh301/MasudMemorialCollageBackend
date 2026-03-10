@@ -9,9 +9,11 @@ const createStudentAdmissionIntoDB = async (req: Request) => {
 
   const file = req.file as IFile;
 
+  let imageUrl = null;
   if (file) {
-  req.body.image = file.path;
+    imageUrl = file.path; 
   }
+
   const result = await prisma.studentAdmission.create({
     data: {
       firstName: body.firstName,
@@ -40,7 +42,7 @@ const createStudentAdmissionIntoDB = async (req: Request) => {
 
       admissionFee: body.admissionFee,
       paymentStatus: body.paymentStatus || "UNPAID",
-
+      image: imageUrl,
 
       departmentId: body.departmentId,
     },
