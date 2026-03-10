@@ -7,7 +7,6 @@ const createStudentAdmissionIntoDB = async (req: Request) => {
 
   const body = req.body;
 
-  let imageUrl = body.image;
   const file = req.file as IFile;
 
   if (file) {
@@ -42,7 +41,6 @@ const createStudentAdmissionIntoDB = async (req: Request) => {
       admissionFee: body.admissionFee,
       paymentStatus: body.paymentStatus || "UNPAID",
 
-      image: imageUrl,
 
       departmentId: body.departmentId,
     },
