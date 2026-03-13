@@ -5,8 +5,8 @@ const createDepartmentValidation = z.object({
     name: z.string({
       required_error: "Department name is required",
     }),
-    discription: z.string({
-      required_error: "Ddiscription is required",
+    description: z.string({
+      required_error: "description is required",
     }),
 
     year: z.string({
