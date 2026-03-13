@@ -119,9 +119,9 @@ model Result {
 }
 
 model Department {
-  id   String @id @default(uuid())
-  name String
-  year String
+  id          String @id @default(uuid())
+  name        String
+  year        String
   description String
 
   results          Result[]
