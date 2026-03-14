@@ -14,6 +14,12 @@ router.get(
     userController.getAllFromDB
 );
 
+
+router.get(
+    '/total-user',
+    userController.getTotalUser
+)
+
 router.get(
     '/me',
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT),

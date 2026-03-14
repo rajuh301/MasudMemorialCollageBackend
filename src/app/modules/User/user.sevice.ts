@@ -264,11 +264,30 @@ const updateMyProfie = async (user: IAuthUser, req: Request) => {
 }
 
 
+const getTotalUser = async () => {
+
+    const teacher = (await prisma.teacher.findMany()).length;
+    const student = (await prisma.student.findMany()).length;
+    const department = (await prisma.department.findMany()).length;
+
+
+    return {
+        teacher,
+        student,
+        department,
+        prize: 50
+    }
+
+
+}
+
+
 export const userService = {
     createAdmin,
     getAllFromDB,
     changeProfileStatus,
     getMyProfile,
     updateMyProfie,
-    createTeacher
+    createTeacher,
+    getTotalUser
 }

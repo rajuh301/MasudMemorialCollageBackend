@@ -12,6 +12,7 @@ import { ContactRoutes } from '../modules/Contact/contact.route';
 import { StudentAdmissionRoutes } from '../modules/Student/studentAdmission.route';
 import { DepartmentRoutes } from '../modules/Department/department.route';
 import { AttendanceRoutes } from '../modules/Attendance/attendance.routes';
+import { NewsRoutes } from '../modules/News/news.route';
 
 
 const router = express.Router();
@@ -70,6 +71,10 @@ const moduleRoutes = [
     {
         path: '/attendance',
         route: AttendanceRoutes
+    },
+    {
+        path: '/news',
+        route: NewsRoutes
     },
   
 ];
