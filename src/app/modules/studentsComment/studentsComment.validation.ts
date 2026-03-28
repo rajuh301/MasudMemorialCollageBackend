@@ -14,13 +14,12 @@ const createStudentsCommentValidation = z.object({
 
 
 const updateStudentsCommentValidation = z.object({
-  body: z.object({
-    name: z.string().optional(),
-    description: z.string().optional(),
-    batch: z.string().optional(),
-    image: z.string().optional(),
-  }),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  batch: z.string().optional(),
+  image: z.string().optional(),
 });
+
 
 export const StudentsCommentValidation = {
   createStudentsCommentValidation,

@@ -16,7 +16,7 @@ const createOurTeacherIntoDB = async (req: Request) => {
   const file = req.file as IFile;
 
   if (file) {
-  req.body.image = file.path;
+    req.body.image = file.path;
   }
 
   const result = await prisma.ourTeachers.create({
@@ -55,31 +55,36 @@ const getSingleOurTeacherFromDB = async (id: string) => {
   return teacher;
 };
 
-const updateOurTeacherIntoDB = async (id: string, payload: any) => {
-  const dataToUpdate: any = {};
-
-  for (const key of Object.keys(payload)) {
-    if (allowedFields.includes(key)) {
-      dataToUpdate[key] = payload[key];
-    } else {
-      throw new Error(`Field "${key}" is not valid for Teacher`);
-    }
-  }
-
-  const existingTeacher = await prisma.ourTeachers.findFirst({
-    where: {
-      id,
-      isDeleted: false,
-    },
+const updateOurTeacherIntoDB = async (id: string, req: Request) => {
+  const file = req.file as IFile;
+  
+  // 1. Check if teacher exists
+  const existingTeacher = await prisma.ourTeachers.findUnique({
+    where: { id, isDeleted: false },
   });
 
   if (!existingTeacher) {
     throw new Error("Teacher not found or already deleted");
   }
 
+  // 2. Clone the body so we don't mutate the original request
+  const updateData: any = { ...req.body };
+
+  // 3. Handle image if uploaded
+  if (file) {
+    updateData.image = file.path;
+  }
+
+  // 4. CLEANUP: Prisma will throw an error if "data", "file", or "id" 
+  // are inside the data object. We must remove them.
+  delete updateData.data; 
+  delete updateData.id;
+  delete updateData.file;
+
+  // 5. Execute Update
   const result = await prisma.ourTeachers.update({
     where: { id },
-    data: dataToUpdate,
+    data: updateData, // This now contains name, position, subject, etc.
   });
 
   return result;

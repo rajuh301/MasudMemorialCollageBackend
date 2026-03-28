@@ -43,9 +43,9 @@ const getSingleEvent = catchAsync(async (req: Request, res: Response) => {
 
 const updateEvent = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const data = req.body;
 
-  const result = await EventService.updateEventIntoDB(id, data);
+  // Pass req to service to handle both the file and the parsed body
+  const result = await EventService.updateEventIntoDB(id, req);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

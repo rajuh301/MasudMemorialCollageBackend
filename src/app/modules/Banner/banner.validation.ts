@@ -17,12 +17,10 @@ const createBannerValidation = z.object({
 });
 
 const updateBannerValidation = z.object({
-  body: z.object({
-    title: z.string().optional(),
-    subTitle: z.string().optional(),
-    description: z.string().optional(),
-    image: z.string().optional(),
-  }),
+  title: z.string().optional(),
+  subTitle: z.string().optional(),
+  description: z.string().optional(),
+  image: z.string().optional(),
 });
 
 export const BannerValidation = {

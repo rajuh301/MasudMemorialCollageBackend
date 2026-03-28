@@ -11,11 +11,30 @@ const createStudentAdmissionIntoDB = async (req: Request) => {
 
   let imageUrl = null;
   if (file) {
-    imageUrl = file.path; 
+    imageUrl = file.path;
   }
+
+  // find last student roll
+  const lastStudent = await prisma.studentAdmission.findFirst({
+    orderBy: {
+      createdAt: "desc",
+    },
+    select: {
+      studentRoll: true,
+    },
+  });
+
+  let newRoll = "001";
+
+  if (lastStudent?.studentRoll) {
+    const lastRollNumber = parseInt(lastStudent.studentRoll);
+    newRoll = String(lastRollNumber + 1).padStart(3, "0");
+  }
+
 
   const result = await prisma.studentAdmission.create({
     data: {
+      studentRoll: newRoll,
       firstName: body.firstName,
       lastName: body.lastName,
       email: body.email,

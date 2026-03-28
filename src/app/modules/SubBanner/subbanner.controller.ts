@@ -43,9 +43,9 @@ const getSingleSubBanner = catchAsync(async (req: Request, res: Response) => {
 
 const updateSubBanner = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const data = req.body;
 
-  const result = await SubBannerService.updateSubBannerIntoDB(id, data);
+  // Pass the full request to handle the file and the parsed body
+  const result = await SubBannerService.updateSubBannerIntoDB(id, req);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -54,6 +54,7 @@ const updateSubBanner = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 
 const deleteSubBanner = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;

@@ -99,23 +99,28 @@ model Student {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  results Result[]
-
   @@map("students")
 }
 
 model Result {
-  id           String @id @default(uuid())
-  studentId    String
+ id String @id @default(uuid())
+
+  studentRoll String
+
   departmentId String
+  department   Department @relation(fields: [departmentId], references: [id])
 
-  marks Float
-  grade String
+  subject String
+  marks   Float
+  grade   String
 
-  student    Student    @relation(fields: [studentId], references: [id])
-  department Department @relation(fields: [departmentId], references: [id])
+  examType String
 
   createdAt DateTime @default(now())
+
+  @@unique([studentRoll, subject, examType])
+
+  @@map("results")
 }
 
 model Department {
@@ -130,6 +135,7 @@ model Department {
 
 model StudentAdmission {
   id               String        @id @default(uuid())
+  studentRoll      String        @unique
   firstName        String
   lastName         String
   email            String?       @unique
@@ -162,6 +168,8 @@ model StudentAdmission {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   image     String?
+
+  isDeleted Boolean @default(false)
 
   @@map("student_admissions")
 }
@@ -278,17 +286,11 @@ model Contact {
 model News {
   id String @id @default(uuid())
 
-  lable String
-  value String?
-    createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  lable     String
+  value     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
-
-
-
-
-
 
 enum PaymentStatus {
   PAID

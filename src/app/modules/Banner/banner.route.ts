@@ -24,25 +24,33 @@ router.post(
 
 
 router.get(
-    "/",
-    BannerController.getBanner
+  "/",
+  BannerController.getBanner
 );
 router.get(
-    "/:id",
-    BannerController.getSingleBanner
+  "/:id",
+  BannerController.getSingleBanner
 );
 
 
 router.patch(
-    "/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-    validateRequest(BannerValidation.updateBannerValidation),
-    BannerController.updateBanner
+  "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  fileUploader.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      // This correctly populates req.body with the validated fields
+      req.body = BannerValidation.updateBannerValidation.parse(
+        JSON.parse(req.body.data)
+      );
+    }
+    return BannerController.updateBanner(req, res, next);
+  }
 );
 
 router.delete(
-    "/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   BannerController.deleteBanner
 );
 

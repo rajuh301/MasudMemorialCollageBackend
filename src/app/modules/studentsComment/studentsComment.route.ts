@@ -27,12 +27,21 @@ router.post(
 router.get("/", StudentsCommentController.getStudentsComment);
 router.get("/:id", StudentsCommentController.getSingleStudentsComment);
 
-router.patch("/:id",
-
+router.patch(
+    "/:id",
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-    validateRequest(StudentsCommentValidation.updateStudentsCommentValidation),
+    fileUploader.upload.single("file"), // 1. Handle file
+    (req: Request, res: Response, next: NextFunction) => {
+        // 2. Parse and validate JSON from 'data' field
+        if (req.body.data) {
+            req.body = StudentsCommentValidation.updateStudentsCommentValidation.parse(
+                JSON.parse(req.body.data)
+            );
+        }
+        return StudentsCommentController.updateStudentsComment(req, res, next);
+    }
+);
 
-    StudentsCommentController.updateStudentsComment);
 
 router.delete("/:id",
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),

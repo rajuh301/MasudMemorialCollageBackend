@@ -9,10 +9,10 @@ const allowedFields = ["name", "description", "batch", "image"];
 
 const createStudentsCommentIntoDB = async (req: Request) => {
 
-   const file = req.file as IFile;
+  const file = req.file as IFile;
 
   if (file) {
-  req.body.image = file.path;
+    req.body.image = file.path;
   }
 
   const result = await prisma.studentsComment.create({
@@ -45,27 +45,32 @@ const getSingleStudentsCommentFromDB = async (id: string) => {
 };
 
 // Update comment
-const updateStudentsCommentIntoDB = async (id: string, payload: any) => {
-  // Filter allowed fields
-  const dataToUpdate: any = {};
-  for (const key of Object.keys(payload)) {
-    if (allowedFields.includes(key)) {
-      dataToUpdate[key] = payload[key];
-    } else {
-      throw new Error(`Field "${key}" is not valid for Student Comment`);
-    }
-  }
+const updateStudentsCommentIntoDB = async (id: string, req: Request) => {
+  const file = req.file as IFile;
 
+  // 1. Check existence
   const existingComment = await prisma.studentsComment.findUnique({
     where: { id },
   });
+
   if (!existingComment) {
     throw new Error("Student comment not found");
   }
 
+  // 2. Prepare payload
+  const updateData: any = { ...req.body };
+
+  if (file) {
+    updateData.image = file.path;
+  }
+
+  // 3. SANITIZE: Remove any non-schema fields
+  // This removes "data", "id", or anything else passed in req.body
+  const { data, id: bodyId, file: fileKey, ...sanitizedData } = updateData;
+
   const result = await prisma.studentsComment.update({
     where: { id },
-    data: dataToUpdate,
+    data: sanitizedData,
   });
 
   return result;

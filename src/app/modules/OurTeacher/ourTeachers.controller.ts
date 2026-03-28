@@ -43,9 +43,9 @@ const getSingleOurTeacher = catchAsync(async (req: Request, res: Response) => {
 
 const updateOurTeacher = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const data = req.body;
 
-  const result = await OurTeachersService.updateOurTeacherIntoDB(id, data);
+  // CRITICAL: Pass 'req', not 'req.body'
+  const result = await OurTeachersService.updateOurTeacherIntoDB(id, req);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -54,6 +54,7 @@ const updateOurTeacher = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 
 const deleteOurTeacher = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;

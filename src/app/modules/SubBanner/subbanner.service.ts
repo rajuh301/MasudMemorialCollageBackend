@@ -46,16 +46,41 @@ const getSingleSubBannerFromDB = async (id: string) => {
   return result;
 };
 
-const updateSubBannerIntoDB = async (id: string, payload: any) => {
+
+
+
+const updateSubBannerIntoDB = async (id: string, req: Request) => {
+  const file = req.file as IFile;
+
+  // 1. Check if it exists
+  const isExist = await prisma.subBanner.findUnique({
+    where: { id },
+  });
+
+  if (!isExist) {
+    throw new Error("Sub Banner not found");
+  }
+
+  // 2. Prepare payload
+  const updateData: any = { ...req.body };
+
+  if (file) {
+    updateData.image = file.path;
+  }
+
+  // 3. Sanitize: remove 'data' and 'id' from the payload before Prisma update
+  const { data, id: bodyId, ...sanitizedData } = updateData;
+
   const result = await prisma.subBanner.update({
-    where: {
-      id,
-    },
-    data: payload,
+    where: { id },
+    data: sanitizedData,
   });
 
   return result;
 };
+
+
+
 
 const deleteSubBannerFromDB = async (id: string) => {
   const result = await prisma.subBanner.delete({

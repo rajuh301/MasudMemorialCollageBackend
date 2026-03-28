@@ -50,8 +50,9 @@ const getSingleBanner = catchAsync(async (req: Request, res: Response) => {
 
 const updateBanner = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const data = req.body;
-  const result = await BannerService.updateBannerIntoDB(id, data);
+
+  // Pass req to the service to handle both the file and the body
+  const result = await BannerService.updateBannerIntoDB(id, req);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

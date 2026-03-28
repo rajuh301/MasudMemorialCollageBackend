@@ -8,7 +8,7 @@ const createBannerIntoDB = async (req: Request) => {
   const file = req.file as IFile;
 
   if (file) {
-  req.body.image = file.path;
+    req.body.image = file.path;
   }
 
   const result = await prisma.banner.create({
@@ -32,7 +32,7 @@ const getBannerFromDB = async () => {
 
 const getSingleBannerFromDB = async (id: string) => {
 
-    
+
 
   const result = await prisma.banner.findFirst({
     where: {
@@ -41,36 +41,45 @@ const getSingleBannerFromDB = async (id: string) => {
     },
   });
 
-  if(!result){
+  if (!result) {
     throw new Error("Banner not found");
   }
 
   return result;
 };
 
-const updateBannerIntoDB = async (id: string, data: any) => {
 
-  const banner = await prisma.banner.findFirst({
-    where: {
-      id: id,
-      isDeleted: false,
-    },
+const updateBannerIntoDB = async (id: string, req: Request) => {
+  const file = req.file as IFile;
+
+  // 1. Verify existence
+  const isExist = await prisma.banner.findUnique({
+    where: { id, isDeleted: false },
   });
 
-  if (!banner) {
-    throw new Error("Banner not found");
+  if (!isExist) {
+    throw new Error("Banner not found or already deleted");
   }
+
+  // 2. Extract validated data from req.body
+  const updateData: any = { ...req.body };
+
+  // 3. Attach new image path if file exists
+  if (file) {
+    updateData.image = file.path;
+  }
+
+  // 4. Final safety: Remove any keys that aren't in the Banner Prisma Model
+  // This prevents the "Unknown argument" error if 'data' or 'id' slipped through
+  const { data, id: bodyId, ...sanitizedData } = updateData;
 
   const result = await prisma.banner.update({
-    where: {
-      id: banner.id,
-    },
-    data: data,
+    where: { id },
+    data: sanitizedData,
   });
 
   return result;
 };
-
 const deleteBannerFromDB = async (id: string) => {
 
   const banner = await prisma.banner.findFirst({

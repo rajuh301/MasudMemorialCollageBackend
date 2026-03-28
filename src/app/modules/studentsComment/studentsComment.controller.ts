@@ -42,8 +42,9 @@ const getSingleStudentsComment = catchAsync(async (req: Request, res: Response) 
 
 const updateStudentsComment = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const data = req.body;
-  const result = await StudentsCommentService.updateStudentsCommentIntoDB(id, data);
+
+  // Pass the full request object to handle file + body
+  const result = await StudentsCommentService.updateStudentsCommentIntoDB(id, req);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

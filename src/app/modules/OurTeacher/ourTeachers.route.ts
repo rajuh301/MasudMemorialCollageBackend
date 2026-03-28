@@ -28,8 +28,16 @@ router.get("/:id", OurTeachersController.getSingleOurTeacher);
 router.patch(
   "/:id",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  validateRequest(OurTeachersValidation.updateOurTeacherValidation),
-  OurTeachersController.updateOurTeacher
+  fileUploader.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    // This part is what actually fills req.body
+    if (req.body.data) {
+      req.body = OurTeachersValidation.updateOurTeacherValidation.parse(
+        JSON.parse(req.body.data)
+      );
+    }
+    return OurTeachersController.updateOurTeacher(req, res, next);
+  }
 );
 
 router.delete(

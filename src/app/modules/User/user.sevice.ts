@@ -267,7 +267,7 @@ const updateMyProfie = async (user: IAuthUser, req: Request) => {
 const getTotalUser = async () => {
 
     const teacher = (await prisma.teacher.findMany()).length;
-    const student = (await prisma.student.findMany()).length;
+    const student = (await prisma.studentAdmission.findMany()).length;
     const department = (await prisma.department.findMany()).length;
 
 

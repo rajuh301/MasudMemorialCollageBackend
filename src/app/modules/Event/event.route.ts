@@ -21,19 +21,28 @@ router.post(
     return EventController.createEvent(req, res, next);
   }
 );
-    
+
 
 router.get("/", EventController.getEvent);
 
 router.get("/:id", EventController.getSingleEvent);
 
-router.patch("/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-    validateRequest(EventValidation.updateEventValidation),
-    EventController.updateEvent);
+router.patch(
+  "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  fileUploader.upload.single("file"), // Handle file in update
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = EventValidation.updateEventValidation.parse(
+        JSON.parse(req.body.data)
+      );
+    }
+    return EventController.updateEvent(req, res, next);
+  }
+);
 
 router.delete("/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-    EventController.deleteEvent);
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  EventController.deleteEvent);
 
 export const EventRoutes = router;

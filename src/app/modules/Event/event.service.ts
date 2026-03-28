@@ -7,10 +7,10 @@ import { IFile } from "../../interfaces/file";
 
 const createEventIntoDB = async (req: Request) => {
 
-   const file = req.file as IFile;
+  const file = req.file as IFile;
 
   if (file) {
-  req.body.image = file.path;
+    req.body.image = file.path;
   }
   const result = await prisma.event.create({
     data: {
@@ -38,23 +38,36 @@ const getSingleEventFromDB = async (id: string) => {
   });
   return result;
 };
+const updateEventIntoDB = async (id: string, req: Request) => {
+  const file = req.file as IFile;
 
-const updateEventIntoDB = async (id: string, payload: any) => {
+  const isExist = await prisma.event.findUnique({
+    where: { id, isDeleted: false },
+  });
 
-    const existingEvent = await prisma.event.findFirst({
-        where:{id,
-            isDeleted:false
-        },
-    });
-
-  if (!existingEvent) {
+  if (!isExist) {
     throw new Error("Event not found or already deleted");
   }
 
+  const updateData: any = { ...req.body };
+
+  if (file) {
+    updateData.image = file.path;
+  }
+
+  // Handle Date conversion if date is being updated
+  if (updateData.date) {
+    updateData.date = new Date(updateData.date);
+  }
+
+  // Sanitize data to remove non-schema fields (like 'data' from Postman)
+  const { data, id: bodyId, ...sanitizedData } = updateData;
+
   const result = await prisma.event.update({
     where: { id },
-    data: payload,
+    data: sanitizedData,
   });
+
   return result;
 };
 

@@ -25,24 +25,32 @@ router.post(
 
 
 router.get(
-    "/",
-    SubBannerController.getSubBanner
+  "/",
+  SubBannerController.getSubBanner
 );
 
 router.get(
-    "/:id",
-    SubBannerController.getSingleSubBanner
+  "/:id",
+  SubBannerController.getSingleSubBanner
 );
 
 router.patch(
-    "/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-    SubBannerController.updateSubBanner
+  "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  fileUploader.upload.single("file"), // Added file handling
+  (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.data) {
+      req.body = SubBannerValidation.updateSubBannerValidation.parse(
+        JSON.parse(req.body.data)
+      );
+    }
+    return SubBannerController.updateSubBanner(req, res, next);
+  }
 );
 
 router.delete(
-    "/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   SubBannerController.deleteSubBanner
 );
 
