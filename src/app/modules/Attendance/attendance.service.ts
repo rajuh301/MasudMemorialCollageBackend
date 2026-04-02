@@ -4,6 +4,53 @@ import httpStatus from "http-status";
 
 import ApiError from "../../errors/ApiError"
 
+
+
+const registerFaceIntoDB = async (teacherId: string, descriptor: number[]) => {
+  const teacher = await prisma.teacher.findUnique({
+    where: { id: teacherId },
+  });
+
+  if (!teacher) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Teacher not found");
+  }
+
+  if (teacher.isDeleted) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Teacher is deleted");
+  }
+
+  const result = await prisma.teacher.update({
+    where: { id: teacherId },
+    data: {
+      faceDescriptor: descriptor,
+    } as any,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      faceDescriptor: true,
+    } as any,
+  });
+
+  return result;
+};
+
+const getAllTeachersWithDescriptors = async () => {
+  const teachers = await prisma.teacher.findMany({
+    where: {
+      isDeleted: false,
+    },
+    select: {
+      id: true,
+      name: true,
+      faceDescriptor: true,
+    } as any,
+  });
+
+  return teachers.filter((t: any) => t.faceDescriptor !== null);
+};
+
+
 const createAttendanceIntoDB = async (req: Request) => {
   const { teacherId } = req.body;
 
@@ -68,5 +115,7 @@ const getAttendancesFromDB = async () => {
 
 export const AttendanceService = {
   createAttendanceIntoDB,
-  getAttendancesFromDB
+  getAttendancesFromDB,
+  registerFaceIntoDB,
+  getAllTeachersWithDescriptors
 };

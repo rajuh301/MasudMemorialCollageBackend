@@ -264,6 +264,7 @@ model OurTeachers {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   image       String?
+   faceDescriptor Json?
 
   @@map("ourTeachers")
 }
