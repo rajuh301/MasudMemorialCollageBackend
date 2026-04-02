@@ -52,7 +52,8 @@ model Teacher {
   contactNumber String
   joiningDate   DateTime
   address       String
-
+  attendances Attendance[]
+faceDescriptor Float64[]
   createdById String
   createdBy   Admin? @relation("AdminToTeacher", fields: [createdById], references: [id])
 
