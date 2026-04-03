@@ -4,10 +4,7 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { AttendanceService } from "./attendance.service";
 
-
-
-
-
+// 1. Register teacher face
 const registerFace = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { descriptor } = req.body;
@@ -29,6 +26,7 @@ const registerFace = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// 2. Get all teachers with descriptors (for face scanner)
 const getAllTeachersWithDescriptors = catchAsync(
   async (req: Request, res: Response) => {
     const result = await AttendanceService.getAllTeachersWithDescriptors();
@@ -42,8 +40,7 @@ const getAllTeachersWithDescriptors = catchAsync(
   }
 );
 
-
-
+// 3. Mark attendance via face recognition
 const createAttendance = catchAsync(async (req: Request, res: Response) => {
   const result = await AttendanceService.createAttendanceIntoDB(req);
 
@@ -55,20 +52,36 @@ const createAttendance = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// 4. Admin: get ALL attendances
 const getAllAttendances = catchAsync(async (req: Request, res: Response) => {
-  const result = await AttendanceService.getAttendancesFromDB();
+  const result = await AttendanceService.getAttendancesFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Attendances fetched successfully",
+    message: "All attendances fetched successfully",
+    data: result,
+  });
+});
+
+// 5. Teacher: get OWN attendances
+const getMyAttendances = catchAsync(async (req: Request, res: Response) => {
+  const userId = (req as any).user?.id; // injected by auth middleware
+
+  const result = await AttendanceService.getMyAttendancesFromDB(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Your attendances fetched successfully",
     data: result,
   });
 });
 
 export const AttendanceController = {
+  registerFace,
+  getAllTeachersWithDescriptors,
   createAttendance,
   getAllAttendances,
-  registerFace,
-  getAllTeachersWithDescriptors
+  getMyAttendances,
 };

@@ -9,8 +9,6 @@ const registerFaceValidation = z.object({
   }),
 });
 
-
-
 const createAttendanceValidation = z.object({
   body: z.object({
     teacherId: z.string({ required_error: "Teacher ID is required" }),

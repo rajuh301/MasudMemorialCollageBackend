@@ -1,121 +1,143 @@
 import { Request } from "express";
 import prisma from "../../../shared/prisma";
 import httpStatus from "http-status";
+import ApiError from "../../errors/ApiError";
 
-import ApiError from "../../errors/ApiError"
-
-
-
+// 1. Register teacher face descriptor
 const registerFaceIntoDB = async (teacherId: string, descriptor: number[]) => {
   const teacher = await prisma.teacher.findUnique({
-    where: { id: teacherId },
+    where: { id: teacherId, isDeleted: false },
   });
 
-  if (!teacher) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Teacher not found");
-  }
+  if (!teacher) throw new ApiError(httpStatus.NOT_FOUND, "Teacher not found");
 
-  if (teacher.isDeleted) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Teacher is deleted");
-  }
-
-  const result = await prisma.teacher.update({
+  return await prisma.teacher.update({
     where: { id: teacherId },
-    data: {
-      faceDescriptor: descriptor,
-    } as any,
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      faceDescriptor: true,
-    } as any,
+    data: { faceDescriptor: descriptor },
+    select: { id: true, name: true, email: true },
   });
-
-  return result;
 };
 
+// 2. Get all teachers with face descriptors (used by face recognition scanner)
 const getAllTeachersWithDescriptors = async () => {
   const teachers = await prisma.teacher.findMany({
     where: {
       isDeleted: false,
+      NOT: { faceDescriptor: { isEmpty: true } },
     },
-    select: {
-      id: true,
-      name: true,
-      faceDescriptor: true,
-    } as any,
+    select: { id: true, name: true, faceDescriptor: true },
   });
-
-  return teachers.filter((t: any) => t.faceDescriptor !== null);
+  return teachers;
 };
 
-
+// 3. Mark attendance by face (teacherId resolved on frontend after face match)
 const createAttendanceIntoDB = async (req: Request) => {
   const { teacherId } = req.body;
 
-  const now = new Date(); // বর্তমান সময়
+  const teacher = await prisma.teacher.findUnique({
+    where: { id: teacherId, isDeleted: false },
+  });
 
-  // ১. আজকের রেঞ্জ বের করা (ডুপ্লিকেট চেক করার জন্য)
+  if (!teacher) throw new ApiError(httpStatus.NOT_FOUND, "Teacher not found");
+
+  const now = new Date();
+
+  // Build today's date range
   const todayStart = new Date(now);
   todayStart.setHours(0, 0, 0, 0);
 
   const todayEnd = new Date(now);
   todayEnd.setHours(23, 59, 59, 999);
 
-  // ২. অফিস টাইম সেট করা (সকাল ১০:০০ AM)
-  const officeTime = new Date(now);
-  officeTime.setHours(10, 0, 0, 0);
-
-  // ৩. ডুপ্লিকেট চেক: আজ অলরেডি অ্যাটেনডেন্স নিয়েছে কি না
-  const existingAttendance = await prisma.attendance.findFirst({
+  // Prevent duplicate attendance on same day
+  const existing = await prisma.attendance.findFirst({
     where: {
       teacherId,
-      date: {
-        gte: todayStart,
-        lte: todayEnd,
+      date: { gte: todayStart, lte: todayEnd },
+    },
+  });
+
+  if (existing)
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Attendance already marked for today!"
+    );
+
+  // Late if after 10:00 AM
+  const officeDeadline = new Date(now);
+  officeDeadline.setHours(10, 0, 0, 0);
+  const status = now > officeDeadline ? "LATE" : "PRESENT";
+
+  return await prisma.attendance.create({
+    data: {
+      teacherId,
+      status,
+      date: now,
+    },
+    include: {
+      teacher: {
+        select: { id: true, name: true, email: true },
       },
     },
   });
-
-  if (existingAttendance) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "Attendance already submitted for today!");
-  }
-
-  // ৪. লেট (Late) চেক লজিক
-  // যদি বর্তমান সময় ১০:০০ AM এর বেশি হয়, তবে status হবে "LATE"
-  let attendanceStatus = "PRESENT";
-  if (now > officeTime) {
-    attendanceStatus = "LATE";
-  }
-
-  // ৫. ডাটাবেসে সেভ করা
-  const result = await prisma.attendance.create({
-    data: {
-      teacherId,
-      status: attendanceStatus,
-      date: now, // সঠিক সময়টি সেভ হবে
-    },
-    include: {
-      teacher: true,
-    }
-  });
-
-  return result;
 };
 
+// 4. Admin: get ALL attendances (with optional date & teacher filters)
+const getAttendancesFromDB = async (query: Record<string, unknown>) => {
+  const { teacherId, date } = query;
 
-const getAttendancesFromDB = async () => {
+  const filters: Record<string, unknown> = {};
+
+  if (teacherId) {
+    filters.teacherId = teacherId as string;
+  }
+
+  if (date) {
+    const day = new Date(date as string);
+    const start = new Date(day);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(day);
+    end.setHours(23, 59, 59, 999);
+    filters.date = { gte: start, lte: end };
+  }
+
   return await prisma.attendance.findMany({
-    include: { teacher: true },
-    orderBy: { date: 'desc' }
+    where: filters,
+    orderBy: { date: "desc" },
+    include: {
+      teacher: {
+        select: { id: true, name: true, email: true, profilePhoto: true },
+      },
+    },
   });
 };
 
+// 5. Teacher: get their OWN attendances
+const getMyAttendancesFromDB = async (userId: string) => {
+  // Find teacher by userId (from JWT)
+  const teacher = await prisma.teacher.findUnique({
+    where: { userId, isDeleted: false },
+  });
+
+  if (!teacher)
+    throw new ApiError(httpStatus.NOT_FOUND, "Teacher profile not found");
+
+  return await prisma.attendance.findMany({
+    where: { teacherId: teacher.id },
+    orderBy: { date: "desc" },
+    select: {
+      id: true,
+      date: true,
+      status: true,
+      createdAt: true,
+    },
+  });
+};
 
 export const AttendanceService = {
+  registerFaceIntoDB,
+  getAllTeachersWithDescriptors,
   createAttendanceIntoDB,
   getAttendancesFromDB,
-  registerFaceIntoDB,
-  getAllTeachersWithDescriptors
+  getMyAttendancesFromDB,
 };

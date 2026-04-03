@@ -7,7 +7,7 @@ import { AttendanceController } from "./attendance.controller";
 
 const router = express.Router();
 
-// Register teacher face descriptor
+// 1. Register teacher face descriptor (Admin only)
 router.post(
   "/:id/register-face",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
@@ -15,23 +15,33 @@ router.post(
   AttendanceController.registerFace
 );
 
-// Get all teachers who have a registered face
+// 2. Get all teachers with face descriptors (for scanner — Admin only)
 router.get(
   "/with-descriptors",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   AttendanceController.getAllTeachersWithDescriptors
 );
+
+// 3. Submit attendance via face recognition (Admin/camera machine)
 router.post(
   "/submit",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), // শুধুমাত্র এডমিন ক্যামেরা দিয়ে এটি করতে পারবে
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   validateRequest(AttendanceValidation.createAttendanceValidation),
   AttendanceController.createAttendance
 );
 
+// 4. Admin: get ALL attendances — supports ?teacherId=&date= filters
 router.get(
   "/",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   AttendanceController.getAllAttendances
+);
+
+// 5. Teacher: get their OWN attendances
+router.get(
+  "/my",
+  auth(UserRole.TEACHER),
+  AttendanceController.getMyAttendances
 );
 
 export const AttendanceRoutes = router;
