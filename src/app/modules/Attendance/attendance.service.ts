@@ -9,7 +9,11 @@ const registerFaceIntoDB = async (teacherId: string, descriptor: number[]) => {
     where: { id: teacherId, isDeleted: false },
   });
 
-  if (!teacher) throw new ApiError(httpStatus.NOT_FOUND, "Teacher not found");
+
+    if (!teacher) {
+    throw new Error("Teacher not found");
+  }
+
 
   return await prisma.teacher.update({
     where: { id: teacherId },
