@@ -13,11 +13,11 @@ const registerFaceIntoDB = async (teacherId: string, descriptor: number[]) => {
 
   return await prisma.teacher.update({
     where: { id: teacherId },
-    data: { 
+    data: {
       // USE THIS SYNTAX FOR PRISMA ARRAYS
       faceDescriptor: {
-        set: descriptor 
-      } 
+        set: descriptor
+      }
     },
     select: { id: true, name: true, email: true },
   });
@@ -52,42 +52,36 @@ const createAttendanceIntoDB = async (req: Request) => {
 
   const now = new Date();
 
-  // Build today's date range
-  const todayStart = new Date(now);
-  todayStart.setHours(0, 0, 0, 0);
+  // Set to start and end of current day in UTC/Server time
+  const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+  const endOfDay = new Date(now.setHours(23, 59, 59, 999));
 
-  const todayEnd = new Date(now);
-  todayEnd.setHours(23, 59, 59, 999);
-
-  // Prevent duplicate attendance on same day
   const existing = await prisma.attendance.findFirst({
     where: {
       teacherId,
-      date: { gte: todayStart, lte: todayEnd },
+      date: {
+        gte: startOfDay,
+        lte: endOfDay,
+      },
     },
   });
 
-  if (existing)
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Attendance already marked for today!"
-    );
+  if (existing) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Attendance already marked for today!");
+  }
 
-  // Late if after 10:00 AM
-  const officeDeadline = new Date(now);
-  officeDeadline.setHours(10, 0, 0, 0);
-  const status = now > officeDeadline ? "LATE" : "PRESENT";
+  // Attendance Policy: LATE after 10:00 AM
+  const currentHour = new Date().getHours();
+  const status = currentHour >= 10 ? "LATE" : "PRESENT";
 
   return await prisma.attendance.create({
     data: {
       teacherId,
       status,
-      date: now,
+      date: new Date(), // Actual capture time
     },
     include: {
-      teacher: {
-        select: { id: true, name: true, email: true },
-      },
+      teacher: { select: { name: true, email: true } },
     },
   });
 };
