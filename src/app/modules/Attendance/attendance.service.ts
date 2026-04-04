@@ -14,7 +14,7 @@ const registerFaceIntoDB = async (teacherId: string, descriptor: number[]) => {
   return await prisma.teacher.update({
     where: { id: teacherId },
     data: { 
-      // Ensure we are passing a clean, standard array
+      // USE THIS SYNTAX FOR PRISMA ARRAYS
       faceDescriptor: {
         set: descriptor 
       } 
@@ -23,22 +23,23 @@ const registerFaceIntoDB = async (teacherId: string, descriptor: number[]) => {
   });
 };
 
-// 2. Get all teachers with face descriptors (used by face recognition scanner)
+// 2. Get all teachers with face descriptors
 const getAllTeachersWithDescriptors = async () => {
-  const teachers = await prisma.teacher.findMany({
+  return await prisma.teacher.findMany({
     where: {
       isDeleted: false,
-      // Fixed filter for Float[] arrays
+      // Change isEmpty to a standard array check to avoid 500 errors
       NOT: {
         faceDescriptor: {
-          equals: [] 
+          equals: []
         }
-      }
+      },
     },
     select: { id: true, name: true, faceDescriptor: true },
   });
-  return teachers;
 };
+
+
 // 3. Mark attendance by face (teacherId resolved on frontend after face match)
 const createAttendanceIntoDB = async (req: Request) => {
   const { teacherId } = req.body;
