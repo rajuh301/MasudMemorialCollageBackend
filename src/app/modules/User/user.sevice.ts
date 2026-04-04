@@ -282,6 +282,18 @@ const getTotalUser = async () => {
 }
 
 
+const getAllTeachers = async () => {
+
+    const result = await prisma.teacher.findMany({
+        where: {
+            isDeleted: false,
+            role: UserRole.TEACHER
+        },
+    })
+    return result;
+}
+
+
 export const userService = {
     createAdmin,
     getAllFromDB,
@@ -289,5 +301,6 @@ export const userService = {
     getMyProfile,
     updateMyProfie,
     createTeacher,
-    getTotalUser
+    getTotalUser,
+    getAllTeachers
 }

@@ -107,6 +107,18 @@ const updateMyProfie = catchAsync(async (req: Request & { user?: IAuthUser }, re
     })
 });
 
+
+const getAllTeachers = catchAsync(async (req: Request, res: Response) => {
+    const result = await userService.getAllTeachers();
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Teachers data fetched!",
+        data: result
+    })
+});
+
+
 export const userController = {
     createAdmin,
     getAllFromDB,
@@ -114,5 +126,6 @@ export const userController = {
     getMyProfile,
     updateMyProfie,
     createTeacher,
-    getTotalUser
+    getTotalUser,
+    getAllTeachers
 }

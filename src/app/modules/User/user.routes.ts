@@ -47,6 +47,16 @@ router.post(
     }
 );
 
+
+router.post(
+    "/get-all-teachers",
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER),
+    userController.getAllTeachers
+)
+
+
+
+
 router.patch(
     '/:id/status',
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
