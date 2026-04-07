@@ -5,28 +5,28 @@ import ApiError from "../../errors/ApiError";
 
 // 1. Register teacher face descriptor
 const registerFaceIntoDB = async (teacherId: string, descriptor: number[]) => {
+  // চেক করুন টিচার আছে কি না
   const teacher = await prisma.teacher.findUnique({
     where: { id: teacherId, isDeleted: false },
   });
 
-
-    if (!teacher) {
-    throw new Error("Teacher not found");
+  if (!teacher) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Teacher not found with this ID!");
   }
 
-
+  // ডাটাবেজে আপডেট
   return await prisma.teacher.update({
     where: { id: teacherId },
     data: {
-      // USE THIS SYNTAX FOR PRISMA ARRAYS
-      faceDescriptor: {
-        set: descriptor
-      }
+      faceDescriptor: descriptor // সরাসরি অ্যারে পাঠানো যাবে
     },
-    select: { id: true, name: true, email: true },
+    select: {
+      id: true,
+      name: true,
+      email: true
+    },
   });
 };
-
 // 2. Get all teachers with face descriptors
 const getAllTeachersWithDescriptors = async () => {
   return await prisma.teacher.findMany({
