@@ -9,14 +9,6 @@ const registerFace = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { descriptor } = req.body;
 
-  // ব্যাকএন্ড লেভেলে এক্সট্রা চেক
-  if (!id || id === "undefined") {
-    return res.status(httpStatus.BAD_REQUEST).json({
-      success: false,
-      message: "Valid Teacher ID is required in params"
-    });
-  }
-
   const result = await AttendanceService.registerFaceIntoDB(id, descriptor);
 
   sendResponse(res, {

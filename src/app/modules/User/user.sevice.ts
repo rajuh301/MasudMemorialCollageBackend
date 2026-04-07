@@ -284,12 +284,9 @@ const getTotalUser = async () => {
 
 const getAllTeachers = async () => {
 
-    const result = await prisma.user.findMany({
-        where: {
-            role: UserRole.TEACHER,
-            status: UserStatus.ACTIVE
-        },
+    const result = await prisma.teacher.findMany({
 
+        where: { isDeleted: false }
     })
     return result;
 }
