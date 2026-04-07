@@ -48,9 +48,9 @@ router.post(
 );
 
 
-router.post(
+router.get(
     "/get-all-teachers",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER),
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT),
     userController.getAllTeachers
 )
 
