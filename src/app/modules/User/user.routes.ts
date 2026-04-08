@@ -75,12 +75,4 @@ router.patch(
 );
 
 
-router.delete(
-    "/delete-teacher/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-    userController.deleteTeacher
-)
-
-
-
 export const userRoutes = router;

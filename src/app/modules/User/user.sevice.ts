@@ -138,10 +138,7 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     const whereConditons: Prisma.UserWhereInput = andCondions.length > 0 ? { AND: andCondions } : {};
 
     const result = await prisma.user.findMany({
-        where: {
-            ...whereConditons,
-            isDeleted: false
-        },
+        where: whereConditons,
         skip,
         take: limit,
         orderBy: options.sortBy && options.sortOrder ? {
@@ -197,8 +194,7 @@ const getMyProfile = async (user: IAuthUser) => {
     const userInfo = await prisma.user.findUniqueOrThrow({
         where: {
             email: user?.email,
-            status: UserStatus.ACTIVE,
-            isDeleted: false
+            status: UserStatus.ACTIVE
         },
         select: {
             id: true,
@@ -234,9 +230,7 @@ const updateMyProfie = async (user: IAuthUser, req: Request) => {
     const userInfo = await prisma.user.findUniqueOrThrow({
         where: {
             email: user?.email,
-            status: UserStatus.ACTIVE,
-            isDeleted: false
-
+            status: UserStatus.ACTIVE
         }
     });
 
@@ -272,14 +266,8 @@ const updateMyProfie = async (user: IAuthUser, req: Request) => {
 
 const getTotalUser = async () => {
 
-    const teacher = (await prisma.teacher.findMany({
-        where: { isDeleted: false }
-    }
-    )).length;
-
-    const student = (await prisma.studentAdmission.findMany({
-        where: { isDeleted: false }
-    })).length;
+    const teacher = (await prisma.teacher.findMany()).length;
+    const student = (await prisma.studentAdmission.findMany()).length;
     const department = (await prisma.department.findMany()).length;
 
 
@@ -304,17 +292,6 @@ const getAllTeachers = async () => {
 }
 
 
-const deleteTeacher = async (id: string) => {
-
-    const result = await prisma.teacher.update({
-        where: { id },
-        data: { isDeleted: true }
-    })
-    return result;
-}
-
-
-
 export const userService = {
     createAdmin,
     getAllFromDB,
@@ -323,6 +300,5 @@ export const userService = {
     updateMyProfie,
     createTeacher,
     getTotalUser,
-    getAllTeachers,
-    deleteTeacher
+    getAllTeachers
 }

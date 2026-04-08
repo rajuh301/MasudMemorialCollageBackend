@@ -119,19 +119,6 @@ const getAllTeachers = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-const deleteTeacher = catchAsync(async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const result = await userService.deleteTeacher(id);
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Teacher deleted successfully!",
-        data: result
-    })
-}
-)
-
-
 export const userController = {
     createAdmin,
     getAllFromDB,
@@ -140,6 +127,5 @@ export const userController = {
     updateMyProfie,
     createTeacher,
     getTotalUser,
-    getAllTeachers,
-    deleteTeacher
+    getAllTeachers
 }
