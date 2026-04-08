@@ -10,7 +10,7 @@ const router = express.Router();
 // Get full statement and summary
 router.get(
     "/statement",
-    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+    auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.TEACHER),
     AccountController.getAccountStatement
 );
 
