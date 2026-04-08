@@ -14,6 +14,7 @@ import { DepartmentRoutes } from '../modules/Department/department.route';
 import { AttendanceRoutes } from '../modules/Attendance/attendance.routes';
 import { NewsRoutes } from '../modules/News/news.route';
 import { ResultRoutes } from '../modules/Result/result.route';
+import { AccountRoutes } from '../modules/Account/account.route';
 
 
 const router = express.Router();
@@ -80,6 +81,10 @@ const moduleRoutes = [
     {
         path: '/result',
         route: ResultRoutes
+    },
+    {
+        path: '/account',
+        route: AccountRoutes
     },
   
 ];
