@@ -39,6 +39,15 @@ const createTeacher = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: result
     });
 }));
+const getTotalUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_sevice_1.userService.getTotalUser();
+    (0, sendResponse_1.default)(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Get Total User successfuly!",
+        data: result
+    });
+}));
 const getAllFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const filters = (0, pick_1.default)(req.query, user_constant_1.userFilterableFields);
     const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
@@ -81,11 +90,22 @@ const updateMyProfie = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: result
     });
 }));
+const getAllTeachers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_sevice_1.userService.getAllTeachers();
+    (0, sendResponse_1.default)(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Teachers data fetched!",
+        data: result
+    });
+}));
 exports.userController = {
     createAdmin,
     getAllFromDB,
     changeProfileStatus,
     getMyProfile,
     updateMyProfie,
-    createTeacher
+    createTeacher,
+    getTotalUser,
+    getAllTeachers
 };

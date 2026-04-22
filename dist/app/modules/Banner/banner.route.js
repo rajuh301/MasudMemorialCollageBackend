@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BannerRoutes = void 0;
 const express_1 = __importDefault(require("express"));
-const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
 const banner_validation_1 = require("./banner.validation");
 const banner_controller_1 = require("./banner.controller");
 const auth_1 = __importDefault(require("../../middlewares/auth"));
@@ -18,6 +17,12 @@ router.post("/create-banner", fileUploader_1.fileUploader.upload.single("file"),
 });
 router.get("/", banner_controller_1.BannerController.getBanner);
 router.get("/:id", banner_controller_1.BannerController.getSingleBanner);
-router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), (0, validateRequest_1.default)(banner_validation_1.BannerValidation.updateBannerValidation), banner_controller_1.BannerController.updateBanner);
+router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), fileUploader_1.fileUploader.upload.single("file"), (req, res, next) => {
+    if (req.body.data) {
+        // This correctly populates req.body with the validated fields
+        req.body = banner_validation_1.BannerValidation.updateBannerValidation.parse(JSON.parse(req.body.data));
+    }
+    return banner_controller_1.BannerController.updateBanner(req, res, next);
+});
 router.delete("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), banner_controller_1.BannerController.deleteBanner);
 exports.BannerRoutes = router;

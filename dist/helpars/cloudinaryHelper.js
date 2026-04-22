@@ -12,34 +12,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fileUploader = void 0;
-const multer_1 = __importDefault(require("multer"));
-const multer_storage_cloudinary_1 = require("multer-storage-cloudinary");
+exports.cloudinaryHelper = void 0;
 const cloudinary_1 = require("cloudinary");
 const config_1 = __importDefault(require("../config"));
-// Cloudinary Configuration
+// Configuration
 cloudinary_1.v2.config({
     cloud_name: config_1.default.cloudinary.cloud_name,
     api_key: config_1.default.cloudinary.api_key,
     api_secret: config_1.default.cloudinary.api_secret,
 });
-// Multer Storage for Cloudinary
-const storage = new multer_storage_cloudinary_1.CloudinaryStorage({
-    cloudinary: cloudinary_1.v2,
-    params: (req, file) => __awaiter(void 0, void 0, void 0, function* () {
-        return {
-            folder: 'collage_website/uploads', // আপনার পছন্দমতো ফোল্ডার নাম
-            allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
-            public_id: `${Date.now()}-${file.originalname.split('.')[0]}`,
-        };
-    }),
-});
-const upload = (0, multer_1.default)({
-    storage: storage,
-    limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB limit
+const deleteFromCloudinary = (publicId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield cloudinary_1.v2.uploader.destroy(publicId);
+        return result;
+    }
+    catch (error) {
+        console.error('Cloudinary Delete Error:', error);
+        throw new Error('Failed to delete image from Cloudinary');
     }
 });
-exports.fileUploader = {
-    upload,
+exports.cloudinaryHelper = {
+    cloudinary: cloudinary_1.v2,
+    deleteFromCloudinary
 };

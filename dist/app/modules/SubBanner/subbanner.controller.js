@@ -47,8 +47,8 @@ const getSingleSubBanner = (0, catchAsync_1.default)((req, res) => __awaiter(voi
 }));
 const updateSubBanner = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const data = req.body;
-    const result = yield subbanner_service_1.SubBannerService.updateSubBannerIntoDB(id, data);
+    // Pass the full request to handle the file and the parsed body
+    const result = yield subbanner_service_1.SubBannerService.updateSubBannerIntoDB(id, req);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

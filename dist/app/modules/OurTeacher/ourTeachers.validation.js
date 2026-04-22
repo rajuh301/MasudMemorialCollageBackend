@@ -11,14 +11,12 @@ const createOurTeacherValidation = zod_1.z.object({
     image: zod_1.z.string().optional()
 });
 const updateOurTeacherValidation = zod_1.z.object({
-    body: zod_1.z.object({
-        name: zod_1.z.string().optional(),
-        position: zod_1.z.string().optional(),
-        subject: zod_1.z.string().optional(),
-        description: zod_1.z.string().optional(),
-        rating: zod_1.z.string().optional(),
-        image: zod_1.z.string().optional()
-    }),
+    name: zod_1.z.string().optional(),
+    position: zod_1.z.string().optional(),
+    subject: zod_1.z.string().optional(),
+    description: zod_1.z.string().optional(),
+    rating: zod_1.z.string().optional(),
+    image: zod_1.z.string().optional()
 });
 exports.OurTeachersValidation = {
     createOurTeacherValidation,

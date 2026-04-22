@@ -15,6 +15,11 @@ const studentsComment_route_1 = require("../modules/studentsComment/studentsComm
 const ourTeachers_route_1 = require("../modules/OurTeacher/ourTeachers.route");
 const contact_route_1 = require("../modules/Contact/contact.route");
 const studentAdmission_route_1 = require("../modules/Student/studentAdmission.route");
+const department_route_1 = require("../modules/Department/department.route");
+const attendance_routes_1 = require("../modules/Attendance/attendance.routes");
+const news_route_1 = require("../modules/News/news.route");
+const result_route_1 = require("../modules/Result/result.route");
+const account_route_1 = require("../modules/Account/account.route");
 const router = express_1.default.Router();
 const moduleRoutes = [
     {
@@ -60,6 +65,26 @@ const moduleRoutes = [
     {
         path: '/student',
         route: studentAdmission_route_1.StudentAdmissionRoutes
+    },
+    {
+        path: '/department',
+        route: department_route_1.DepartmentRoutes
+    },
+    {
+        path: '/attendance',
+        route: attendance_routes_1.AttendanceRoutes
+    },
+    {
+        path: '/news',
+        route: news_route_1.NewsRoutes
+    },
+    {
+        path: '/result',
+        route: result_route_1.ResultRoutes
+    },
+    {
+        path: '/account',
+        route: account_route_1.AccountRoutes
     },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

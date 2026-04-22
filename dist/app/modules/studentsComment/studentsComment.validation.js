@@ -9,12 +9,10 @@ const createStudentsCommentValidation = zod_1.z.object({
     image: zod_1.z.string().optional()
 });
 const updateStudentsCommentValidation = zod_1.z.object({
-    body: zod_1.z.object({
-        name: zod_1.z.string().optional(),
-        description: zod_1.z.string().optional(),
-        batch: zod_1.z.string().optional(),
-        image: zod_1.z.string().optional(),
-    }),
+    name: zod_1.z.string().optional(),
+    description: zod_1.z.string().optional(),
+    batch: zod_1.z.string().optional(),
+    image: zod_1.z.string().optional(),
 });
 exports.StudentsCommentValidation = {
     createStudentsCommentValidation,

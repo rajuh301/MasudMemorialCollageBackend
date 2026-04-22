@@ -60,15 +60,13 @@ exports.userService = void 0;
 const client_1 = require("@prisma/client");
 const bcrypt = __importStar(require("bcrypt"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
-const fileUploader_1 = require("../../../helpars/fileUploader");
 const paginationHelper_1 = require("../../../helpars/paginationHelper");
 const user_constant_1 = require("./user.constant");
 const createAdmin = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    const file = req.file;
     // upload image
+    const file = req.file;
     if (file) {
-        const uploadToCloudinary = yield fileUploader_1.fileUploader.uploadToCloudinary(file);
-        req.body.admin.profilePhoto = uploadToCloudinary === null || uploadToCloudinary === void 0 ? void 0 : uploadToCloudinary.secure_url;
+        req.body.image = file.path;
     }
     const hashedPassword = yield bcrypt.hash(req.body.password, 12);
     const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
@@ -97,36 +95,42 @@ const createAdmin = (req) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const createTeacher = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const file = req.file;
+    // ১. ইমেজ হ্যান্ডেলিং (ডাটাবেসে profilePhoto ফিল্ডে যাবে)
     if (file) {
-        const uploadToCloudinary = yield fileUploader_1.fileUploader.uploadToCloudinary(file);
-        req.body.teacher.profilePhoto = uploadToCloudinary === null || uploadToCloudinary === void 0 ? void 0 : uploadToCloudinary.secure_url;
+        req.body.teacher.profilePhoto = file.path;
     }
     const hashedPassword = yield bcrypt.hash(req.body.password, 12);
-    const adminId = req.user.id;
-    if (!adminId)
-        throw new Error("Cannot create teacher: Admin not authenticated.");
-    const adminData = yield prisma_1.default.admin.findUnique({
-        where: { userId: adminId }
+    // ২. অ্যাডমিন ভ্যালিডেশন
+    const adminEmail = req.user.email;
+    const validAdmin = yield prisma_1.default.admin.findUnique({
+        where: { email: adminEmail }
     });
+    if (!validAdmin) {
+        throw new Error("Cannot create teacher: Admin profile not found.");
+    }
+    // ৩. ট্রানজেকশন শুরু
     const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
+        // User টেবিলে ডাটা সেভ (Login credentials)
         const createdUser = yield transactionClient.user.create({
             data: {
                 email: req.body.teacher.email,
                 password: hashedPassword,
-                role: client_1.UserRole.TEACHER,
-                contactNumber: req.body.teacher.contactNumber
+                role: client_1.UserRole.TEACHER, // ✅ রোল সেট করা হলো
+                contactNumber: req.body.teacher.contactNumber,
+                status: client_1.UserStatus.ACTIVE
             }
         });
+        // Teacher টেবিলে প্রোফাইল ডাটা সেভ
         const createdTeacher = yield transactionClient.teacher.create({
             data: {
                 name: req.body.teacher.name,
                 email: req.body.teacher.email,
                 contactNumber: req.body.teacher.contactNumber,
-                profilePhoto: req.body.teacher.profilePhoto,
+                profilePhoto: req.body.teacher.profilePhoto || null, // ✅ ক্লাউডিনারি URL
                 joiningDate: new Date(req.body.teacher.joiningDate),
                 address: req.body.teacher.address,
-                createdById: adminId, // ✅ now always string
-                userId: createdUser.id
+                createdById: validAdmin.id, // ✅ কোন এডমিন তৈরি করেছে তার আইডি
+                userId: createdUser.id // ✅ User টেবিলের সাথে কানেকশন
             }
         });
         return createdTeacher;
@@ -246,8 +250,7 @@ const updateMyProfie = (user, req) => __awaiter(void 0, void 0, void 0, function
     });
     const file = req.file;
     if (file) {
-        const uploadToCloudinary = yield fileUploader_1.fileUploader.uploadToCloudinary(file);
-        req.body.profilePhoto = uploadToCloudinary === null || uploadToCloudinary === void 0 ? void 0 : uploadToCloudinary.secure_url;
+        req.body.image = file.path;
     }
     let profileInfo;
     if (userInfo.role === client_1.UserRole.SUPER_ADMIN) {
@@ -268,11 +271,30 @@ const updateMyProfie = (user, req) => __awaiter(void 0, void 0, void 0, function
     }
     return Object.assign({}, profileInfo);
 });
+const getTotalUser = () => __awaiter(void 0, void 0, void 0, function* () {
+    const teacher = (yield prisma_1.default.teacher.findMany()).length;
+    const student = (yield prisma_1.default.studentAdmission.findMany()).length;
+    const department = (yield prisma_1.default.department.findMany()).length;
+    return {
+        teacher,
+        student,
+        department,
+        prize: 50
+    };
+});
+const getAllTeachers = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.teacher.findMany({
+        where: { isDeleted: false }
+    });
+    return result;
+});
 exports.userService = {
     createAdmin,
     getAllFromDB,
     changeProfileStatus,
     getMyProfile,
     updateMyProfie,
-    createTeacher
+    createTeacher,
+    getTotalUser,
+    getAllTeachers
 };

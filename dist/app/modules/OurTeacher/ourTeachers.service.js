@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OurTeachersService = void 0;
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
-const fileUploader_1 = require("../../../helpars/fileUploader");
 const allowedFields = [
     "name",
     "position",
@@ -25,8 +24,7 @@ const allowedFields = [
 const createOurTeacherIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const file = req.file;
     if (file) {
-        const uploadToCloudinary = yield fileUploader_1.fileUploader.uploadToCloudinary(file);
-        req.body.image = uploadToCloudinary === null || uploadToCloudinary === void 0 ? void 0 : uploadToCloudinary.secure_url;
+        req.body.image = file.path;
     }
     const result = yield prisma_1.default.ourTeachers.create({
         data: req.body
@@ -56,28 +54,30 @@ const getSingleOurTeacherFromDB = (id) => __awaiter(void 0, void 0, void 0, func
     }
     return teacher;
 });
-const updateOurTeacherIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const dataToUpdate = {};
-    for (const key of Object.keys(payload)) {
-        if (allowedFields.includes(key)) {
-            dataToUpdate[key] = payload[key];
-        }
-        else {
-            throw new Error(`Field "${key}" is not valid for Teacher`);
-        }
-    }
-    const existingTeacher = yield prisma_1.default.ourTeachers.findFirst({
-        where: {
-            id,
-            isDeleted: false,
-        },
+const updateOurTeacherIntoDB = (id, req) => __awaiter(void 0, void 0, void 0, function* () {
+    const file = req.file;
+    // 1. Check if teacher exists
+    const existingTeacher = yield prisma_1.default.ourTeachers.findUnique({
+        where: { id, isDeleted: false },
     });
     if (!existingTeacher) {
         throw new Error("Teacher not found or already deleted");
     }
+    // 2. Clone the body so we don't mutate the original request
+    const updateData = Object.assign({}, req.body);
+    // 3. Handle image if uploaded
+    if (file) {
+        updateData.image = file.path;
+    }
+    // 4. CLEANUP: Prisma will throw an error if "data", "file", or "id" 
+    // are inside the data object. We must remove them.
+    delete updateData.data;
+    delete updateData.id;
+    delete updateData.file;
+    // 5. Execute Update
     const result = yield prisma_1.default.ourTeachers.update({
         where: { id },
-        data: dataToUpdate,
+        data: updateData, // This now contains name, position, subject, etc.
     });
     return result;
 });

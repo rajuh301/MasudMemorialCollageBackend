@@ -8,18 +8,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventService = void 0;
-const fileUploader_1 = require("../../../helpars/fileUploader");
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const createEventIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const file = req.file;
     if (file) {
-        const uploadToCloudinary = yield fileUploader_1.fileUploader.uploadToCloudinary(file);
-        req.body.image = uploadToCloudinary === null || uploadToCloudinary === void 0 ? void 0 : uploadToCloudinary.secure_url;
+        req.body.image = file.path;
     }
     const result = yield prisma_1.default.event.create({
         data: Object.assign(Object.assign({}, req.body), { date: new Date(req.body.date) // convert user input
@@ -40,18 +49,27 @@ const getSingleEventFromDB = (id) => __awaiter(void 0, void 0, void 0, function*
     });
     return result;
 });
-const updateEventIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const existingEvent = yield prisma_1.default.event.findFirst({
-        where: { id,
-            isDeleted: false
-        },
+const updateEventIntoDB = (id, req) => __awaiter(void 0, void 0, void 0, function* () {
+    const file = req.file;
+    const isExist = yield prisma_1.default.event.findUnique({
+        where: { id, isDeleted: false },
     });
-    if (!existingEvent) {
+    if (!isExist) {
         throw new Error("Event not found or already deleted");
     }
+    const updateData = Object.assign({}, req.body);
+    if (file) {
+        updateData.image = file.path;
+    }
+    // Handle Date conversion if date is being updated
+    if (updateData.date) {
+        updateData.date = new Date(updateData.date);
+    }
+    // Sanitize data to remove non-schema fields (like 'data' from Postman)
+    const { data, id: bodyId } = updateData, sanitizedData = __rest(updateData, ["data", "id"]);
     const result = yield prisma_1.default.event.update({
         where: { id },
-        data: payload,
+        data: sanitizedData,
     });
     return result;
 });

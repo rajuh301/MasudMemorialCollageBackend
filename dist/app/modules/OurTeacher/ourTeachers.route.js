@@ -7,7 +7,6 @@ exports.OurTeachersRoutes = void 0;
 const express_1 = __importDefault(require("express"));
 const ourTeachers_controller_1 = require("./ourTeachers.controller");
 const auth_1 = __importDefault(require("../../middlewares/auth"));
-const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
 const client_1 = require("@prisma/client");
 const ourTeachers_validation_1 = require("./ourTeachers.validation");
 const fileUploader_1 = require("../../../helpars/fileUploader");
@@ -18,6 +17,12 @@ router.post("/create-teacher", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN
 });
 router.get("/", ourTeachers_controller_1.OurTeachersController.getOurTeachers);
 router.get("/:id", ourTeachers_controller_1.OurTeachersController.getSingleOurTeacher);
-router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), (0, validateRequest_1.default)(ourTeachers_validation_1.OurTeachersValidation.updateOurTeacherValidation), ourTeachers_controller_1.OurTeachersController.updateOurTeacher);
+router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), fileUploader_1.fileUploader.upload.single("file"), (req, res, next) => {
+    // This part is what actually fills req.body
+    if (req.body.data) {
+        req.body = ourTeachers_validation_1.OurTeachersValidation.updateOurTeacherValidation.parse(JSON.parse(req.body.data));
+    }
+    return ourTeachers_controller_1.OurTeachersController.updateOurTeacher(req, res, next);
+});
 router.delete("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), ourTeachers_controller_1.OurTeachersController.deleteOurTeacher);
 exports.OurTeachersRoutes = router;

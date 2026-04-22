@@ -52,7 +52,7 @@ model Teacher {
   contactNumber  String
   joiningDate    DateTime
   address        String
-  faceDescriptor Float[] // PostgreSQL এ এটি double precision array হিসেবে কাজ করবে
+  faceDescriptor Float[] 
 
   createdById String
   createdBy   Admin? @relation("AdminToTeacher", fields: [createdById], references: [id])
@@ -69,6 +69,54 @@ model Teacher {
 
   @@map("teachers")
 }
+model OfficeStaff {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  profilePhoto   String?
+  contactNumber  String
+  joiningDate    DateTime
+  address        String
+  faceDescriptor Float[] 
+
+  createdById String
+  createdBy   Admin? @relation("AdminToTeacher", fields: [createdById], references: [id])
+
+  isDeleted Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdStudents Student[]    @relation("TeacherToStudent")
+  attendances     Attendance[]
+  userId          String       @unique
+  user            User         @relation(fields: [userId], references: [id])
+
+  @@map("officeStaff")
+}
+
+
+model GovermentBody{
+  id String @id @default(uuid())
+  name String
+  image String
+  description String
+  @@map("govermentBody")
+}
+
+model Member{
+  id String @id @default(uuid())
+  name String
+  image String
+  description String
+  @@map("member")
+}
+
+
+
+
+
+
 
 model Attendance {
   id        String   @id @default(uuid())
@@ -104,23 +152,36 @@ model Student {
 }
 
 model Result {
-  id String @id @default(uuid())
-
-  studentRoll String
-
+  id           String     @id @default(uuid())
+  studentRoll  String
   departmentId String
   department   Department @relation(fields: [departmentId], references: [id])
+  subject      String
+  marks        Float
+  grade        String     // e.g., "A+", "A", "A-", "B"
+  examType     String     // e.g., "FINAL", "MID"
+  
+  academicYear Int        // e.g., 2026 (Crucial for "This Year" stats)
+  
+  createdAt    DateTime   @default(now())
 
-  subject String
-  marks   Float
-  grade   String
-
-  examType String
-
-  createdAt DateTime @default(now())
-
-  @@unique([studentRoll, subject, examType])
+  @@unique([studentRoll, subject, examType, academicYear])
   @@map("results")
+}
+
+model ResultSummary {
+  id           String @id @default(uuid())
+  year         Int    @unique
+  totalStudents Int
+  goldenPlus   Int    @default(0)
+  aPlus        Int    @default(0)
+  aGrade       Int    @default(0)
+  aMinus       Int    @default(0)
+  passRate     Float  @default(0.0)
+
+  updatedAt    DateTime @updatedAt
+  
+  @@map("result_summaries")
 }
 
 model Department {
@@ -211,6 +272,10 @@ model Notice {
   description    String
   isImportant    Boolean
   isRecentNotice Boolean
+
+  isAcademicNotic Boolean
+  isOfficialNotic Boolean
+
   date           DateTime
 
   isDeleted Boolean @default(false)
@@ -220,6 +285,40 @@ model Notice {
 
   @@map("notices")
 }
+
+model Leave {
+  id         String      @id @default(uuid())
+  startDate  DateTime
+  endDate    DateTime
+  reason     String
+  status     LeaveStatus @default(PENDING)
+  adminNote  String?     // Optional field for admin to explain why it was denied
+
+  // Relations to the applicants
+  studentId     String?
+  student       Student?     @relation(fields: [studentId], references: [id])
+  
+  teacherId     String?
+  teacher       Teacher?     @relation(fields: [teacherId], references: [id])
+  
+  officeStaffId String?
+  officeStaff   OfficeStaff? @relation(fields: [officeStaffId], references: [id])
+
+  // Relation to the Admin who processed it
+  approvedById  String?
+  approvedBy    Admin?       @relation("AdminToLeave", fields: [approvedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("leaves")
+}
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  DECLINED
+}
+
 
 model Event {
   id String @id @default(uuid())
@@ -321,6 +420,7 @@ enum UserRole {
   ADMIN
   TEACHER
   STUDENT
+  OFFICESTAFF
 }
 
 enum UserStatus {

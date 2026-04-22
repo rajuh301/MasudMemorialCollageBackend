@@ -47,8 +47,8 @@ const getSingleBanner = (0, catchAsync_1.default)((req, res) => __awaiter(void 0
 }));
 const updateBanner = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const data = req.body;
-    const result = yield banner_service_1.BannerService.updateBannerIntoDB(id, data);
+    // Pass req to the service to handle both the file and the body
+    const result = yield banner_service_1.BannerService.updateBannerIntoDB(id, req);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

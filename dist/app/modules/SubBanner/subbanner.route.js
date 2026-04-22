@@ -17,6 +17,12 @@ router.post("/create-sub-banner", (0, auth_1.default)(client_1.UserRole.SUPER_AD
 });
 router.get("/", subbanner_controller_1.SubBannerController.getSubBanner);
 router.get("/:id", subbanner_controller_1.SubBannerController.getSingleSubBanner);
-router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), subbanner_controller_1.SubBannerController.updateSubBanner);
+router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), fileUploader_1.fileUploader.upload.single("file"), // Added file handling
+(req, res, next) => {
+    if (req.body.data) {
+        req.body = subbanner_validatio_1.SubBannerValidation.updateSubBannerValidation.parse(JSON.parse(req.body.data));
+    }
+    return subbanner_controller_1.SubBannerController.updateSubBanner(req, res, next);
+});
 router.delete("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), subbanner_controller_1.SubBannerController.deleteSubBanner);
 exports.SubBannerRoutes = router;

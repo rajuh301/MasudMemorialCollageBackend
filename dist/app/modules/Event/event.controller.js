@@ -47,8 +47,8 @@ const getSingleEvent = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
 }));
 const updateEvent = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const data = req.body;
-    const result = yield event_service_1.EventService.updateEventIntoDB(id, data);
+    // Pass req to service to handle both the file and the parsed body
+    const result = yield event_service_1.EventService.updateEventIntoDB(id, req);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

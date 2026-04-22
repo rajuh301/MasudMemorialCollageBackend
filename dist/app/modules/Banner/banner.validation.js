@@ -15,12 +15,10 @@ const createBannerValidation = zod_1.z.object({
     image: zod_1.z.string().optional(),
 });
 const updateBannerValidation = zod_1.z.object({
-    body: zod_1.z.object({
-        title: zod_1.z.string().optional(),
-        subTitle: zod_1.z.string().optional(),
-        description: zod_1.z.string().optional(),
-        image: zod_1.z.string().optional(),
-    }),
+    title: zod_1.z.string().optional(),
+    subTitle: zod_1.z.string().optional(),
+    description: zod_1.z.string().optional(),
+    image: zod_1.z.string().optional(),
 });
 exports.BannerValidation = {
     createBannerValidation,

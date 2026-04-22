@@ -12,64 +12,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OurTeachersController = void 0;
+exports.DepartmentController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
-const ourTeachers_service_1 = require("./ourTeachers.service");
-const createOurTeacher = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield ourTeachers_service_1.OurTeachersService.createOurTeacherIntoDB(req);
+const department_service_1 = require("./department.service");
+const createDepartment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield department_service_1.DepartmentService.createDepartmentIntoDB(req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
-        message: "Teacher created successfully",
+        message: "Department created successfully",
         data: result,
     });
 }));
-const getOurTeachers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield ourTeachers_service_1.OurTeachersService.getOurTeachersFromDB();
+const getDepartments = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield department_service_1.DepartmentService.getDepartmentsFromDB();
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Teachers fetched successfully",
+        message: "Departments fetched successfully",
         data: result,
     });
 }));
-const getSingleOurTeacher = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getSingleDepartment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield ourTeachers_service_1.OurTeachersService.getSingleOurTeacherFromDB(id);
+    const result = yield department_service_1.DepartmentService.getSingleDepartmentFromDB(id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Teacher fetched successfully",
+        message: "Department fetched successfully",
         data: result,
     });
 }));
-const updateOurTeacher = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateDepartment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    // CRITICAL: Pass 'req', not 'req.body'
-    const result = yield ourTeachers_service_1.OurTeachersService.updateOurTeacherIntoDB(id, req);
+    const result = yield department_service_1.DepartmentService.updateDepartmentIntoDB(id, req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Teacher updated successfully",
+        message: "Department updated successfully",
         data: result,
     });
 }));
-const deleteOurTeacher = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteDepartment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield ourTeachers_service_1.OurTeachersService.deleteOurTeacherFromDB(id);
+    const result = yield department_service_1.DepartmentService.deleteDepartmentFromDB(id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Teacher deleted successfully",
+        message: "Department deleted successfully",
         data: result,
     });
 }));
-exports.OurTeachersController = {
-    createOurTeacher,
-    getOurTeachers,
-    getSingleOurTeacher,
-    updateOurTeacher,
-    deleteOurTeacher,
+exports.DepartmentController = {
+    createDepartment,
+    getDepartments,
+    getSingleDepartment,
+    updateDepartment,
+    deleteDepartment,
 };

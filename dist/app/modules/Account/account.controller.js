@@ -12,20 +12,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.studentController = void 0;
+exports.AccountController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
-const studentAdmission_service_1 = require("./studentAdmission.service");
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
-const createStudentAdmission = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield studentAdmission_service_1.StudentAdmissionService.createStudentAdmissionIntoDB(req);
+const account_service_1 = require("./account.service");
+const createTransaction = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield account_service_1.AccountService.createTransactionIntoDB(req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
-        message: "Student admission created successfully",
+        message: "Transaction recorded successfully",
         data: result,
     });
 }));
-exports.studentController = {
-    createStudentAdmission,
+const getAccountStatement = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield account_service_1.AccountService.getAccountStatementFromDB(req.query);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Account statement fetched successfully",
+        data: result,
+    });
+}));
+exports.AccountController = {
+    createTransaction,
+    getAccountStatement,
 };

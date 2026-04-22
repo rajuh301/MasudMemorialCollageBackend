@@ -7,7 +7,6 @@ exports.StudentsCommentRoutes = void 0;
 const express_1 = __importDefault(require("express"));
 const studentsComment_controller_1 = require("./studentsComment.controller");
 const auth_1 = __importDefault(require("../../middlewares/auth"));
-const validateRequest_1 = __importDefault(require("../../middlewares/validateRequest"));
 const client_1 = require("@prisma/client");
 const studentsComment_validation_1 = require("./studentsComment.validation");
 const fileUploader_1 = require("../../../helpars/fileUploader");
@@ -18,6 +17,13 @@ router.post("/create-student-comment", (0, auth_1.default)(client_1.UserRole.SUP
 });
 router.get("/", studentsComment_controller_1.StudentsCommentController.getStudentsComment);
 router.get("/:id", studentsComment_controller_1.StudentsCommentController.getSingleStudentsComment);
-router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), (0, validateRequest_1.default)(studentsComment_validation_1.StudentsCommentValidation.updateStudentsCommentValidation), studentsComment_controller_1.StudentsCommentController.updateStudentsComment);
+router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), fileUploader_1.fileUploader.upload.single("file"), // 1. Handle file
+(req, res, next) => {
+    // 2. Parse and validate JSON from 'data' field
+    if (req.body.data) {
+        req.body = studentsComment_validation_1.StudentsCommentValidation.updateStudentsCommentValidation.parse(JSON.parse(req.body.data));
+    }
+    return studentsComment_controller_1.StudentsCommentController.updateStudentsComment(req, res, next);
+});
 router.delete("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), studentsComment_controller_1.StudentsCommentController.deleteStudentsComment);
 exports.StudentsCommentRoutes = router;

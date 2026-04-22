@@ -12,55 +12,60 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StudentAdmissionService = exports.createStudentAdmissionIntoDB = void 0;
-const fileUploader_1 = require("../../../helpars/fileUploader");
+exports.StudentAdmissionService = void 0;
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const createStudentAdmissionIntoDB = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    const file = req.file;
     const body = req.body;
-    let imageUrl = body.image;
+    const file = req.file;
+    let imageUrl = null;
     if (file) {
-        const uploaded = yield fileUploader_1.fileUploader.uploadToCloudinary(file);
-        imageUrl = uploaded === null || uploaded === void 0 ? void 0 : uploaded.secure_url;
+        imageUrl = file.path;
     }
-    // Prepare the data for Prisma
-    const data = {
-        firstName: body.firstName,
-        lastName: body.lastName,
-        phone: body.phone,
-        dateOfBirth: new Date(body.dateOfBirth),
-        gender: body.gender,
-        bloodGroup: body.bloodGroup,
-        maritalStatus: body.maritalStatus,
-        presentAddress: body.presentAddress,
-        permanentAddress: body.permanentAddress,
-        guardianName: body.guardianName,
-        guardianPhone: body.guardianPhone,
-        guardianRelation: body.guardianRelation,
-        previousSchool: body.previousSchool,
-        previousGPA: body.previousGPA ? parseFloat(body.previousGPA) : null,
-        passingYear: body.passingYear ? parseInt(body.passingYear) : null,
-        subjects: Array.isArray(body.subjects) ? body.subjects : JSON.parse(body.subjects || '[]'),
-        admissionFee: body.admissionFee ? parseFloat(body.admissionFee) : null,
-        paymentStatus: body.paymentStatus || "UNPAID",
-        image: imageUrl,
-        department: {
-            connect: { id: body.departmentId }
-        }
-    };
-    // Add email if provided
-    if (body.email) {
-        data.email = body.email;
+    // find last student roll
+    const lastStudent = yield prisma_1.default.studentAdmission.findFirst({
+        orderBy: {
+            createdAt: "desc",
+        },
+        select: {
+            studentRoll: true,
+        },
+    });
+    let newRoll = "001";
+    if (lastStudent === null || lastStudent === void 0 ? void 0 : lastStudent.studentRoll) {
+        const lastRollNumber = parseInt(lastStudent.studentRoll);
+        newRoll = String(lastRollNumber + 1).padStart(3, "0");
     }
     const result = yield prisma_1.default.studentAdmission.create({
-        data,
+        data: {
+            studentRoll: newRoll,
+            firstName: body.firstName,
+            lastName: body.lastName,
+            email: body.email,
+            phone: body.phone,
+            dateOfBirth: new Date(body.dateOfBirth),
+            gender: body.gender,
+            bloodGroup: body.bloodGroup,
+            maritalStatus: body.maritalStatus,
+            presentAddress: body.presentAddress,
+            permanentAddress: body.permanentAddress,
+            guardianName: body.guardianName,
+            guardianPhone: body.guardianPhone,
+            guardianRelation: body.guardianRelation,
+            previousSchool: body.previousSchool,
+            previousGPA: body.previousGPA,
+            passingYear: body.passingYear,
+            subjects: body.subjects,
+            admissionFee: body.admissionFee,
+            paymentStatus: body.paymentStatus || "UNPAID",
+            image: imageUrl,
+            departmentId: body.departmentId,
+        },
         include: {
-            department: true
-        }
+            department: true,
+        },
     });
     return result;
 });
-exports.createStudentAdmissionIntoDB = createStudentAdmissionIntoDB;
 exports.StudentAdmissionService = {
-    createStudentAdmissionIntoDB: exports.createStudentAdmissionIntoDB
+    createStudentAdmissionIntoDB,
 };
