@@ -2,12 +2,16 @@ import express from "express";
 import { ResultController } from "./result.controller";
 import validateRequest from "../../middlewares/validateRequest";
 import { ResultValidation } from "./result.validation";
+import auth from "src/app/middlewares/auth";
+import { UserRole } from "@prisma/client";
 
 const router = express.Router();
 
 // Admin / Teacher creates result
 router.post(
   "/create-result",
+  auth(UserRole.SUPER_ADMIN, UserRole.OFFICESTAFF, UserRole.ADMIN),
+
   validateRequest(ResultValidation.createResultValidation),
   ResultController.createResult
 );
