@@ -2,7 +2,7 @@ import express from "express";
 import { ResultController } from "./result.controller";
 import validateRequest from "../../middlewares/validateRequest";
 import { ResultValidation } from "./result.validation";
-import auth from "src/app/middlewares/auth";
+import auth from "../../middlewares/auth"; // ✅ Fixed path
 import { UserRole } from "@prisma/client";
 
 const router = express.Router();
@@ -11,14 +11,13 @@ const router = express.Router();
 router.post(
   "/create-result",
   auth(UserRole.SUPER_ADMIN, UserRole.OFFICESTAFF, UserRole.ADMIN),
-
   validateRequest(ResultValidation.createResultValidation),
   ResultController.createResult
 );
+
 // Student searches result by roll + department
 router.get(
   "/student-result",
-  // validateRequest(getStudentResultValidation),
   ResultController.getStudentResult
 );
 

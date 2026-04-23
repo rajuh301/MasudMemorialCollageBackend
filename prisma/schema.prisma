@@ -19,10 +19,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  admin       Admin?
-  teacher     Teacher?
-  student     Student?
-  officeStaff OfficeStaff?
+  admin            Admin?
+  teacher          Teacher?
+  student          Student?
+  officeStaff      OfficeStaff?
+  studentAdmission StudentAdmission?
 
   @@map("users")
 }
@@ -60,7 +61,8 @@ model Teacher {
   createdById String
   createdBy   Admin? @relation("AdminToTeacher", fields: [createdById], references: [id])
 
-  isDeleted Boolean @default(false)
+  isDeleted        Boolean @default(false)
+  isPasswordChange Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -85,10 +87,14 @@ model OfficeStaff {
   address        String
   faceDescriptor Float[]
 
+  // Default password is built from dateOfBirth (DD/MM/YYYY)
+  dateOfBirth DateTime
+
   createdById String
   createdBy   Admin? @relation("AdminToOfficeStaff", fields: [createdById], references: [id])
 
-  isDeleted Boolean @default(false)
+  isDeleted        Boolean @default(false)
+  isPasswordChange Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -142,6 +148,8 @@ model Student {
   phone        String
   profilePhoto String?
   isDeleted    Boolean @default(false)
+
+  isPasswordChange Boolean @default(true)
 
   teacherCreatedById String?
   teacherCreatedBy   Teacher? @relation("TeacherToStudent", fields: [teacherCreatedById], references: [id])
@@ -237,6 +245,10 @@ model StudentAdmission {
 
   isDeleted Boolean @default(false)
 
+  // Linked User account (created automatically on admission)
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id])
+
   @@map("student_admissions")
 }
 
@@ -277,8 +289,8 @@ model Notice {
   description     String
   isImportant     Boolean
   isRecentNotice  Boolean
-  isAcademicNotic Boolean
-  isOfficialNotic Boolean
+  isAcademicNotic Boolean  @default(false)
+  isOfficialNotic Boolean  @default(false)
   date            DateTime
 
   isDeleted Boolean @default(false)
@@ -307,12 +319,40 @@ model Leave {
   officeStaff   OfficeStaff? @relation("OfficeStaffToLeave", fields: [officeStaffId], references: [id])
 
   approvedById String?
-  approvedBy   Admin?  @relation("AdminToLeave", fields: [approvedById], references: [id])
+  approvedBy   Admin? @relation("AdminToLeave", fields: [approvedById], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("leaves")
+}
+
+model Payment {
+  id String @id @default(uuid())
+
+  studentRoll  String
+  studentName  String
+  studentEmail String?
+  studentPhone String
+
+  amount        Float
+  serviceCharge Float  @default(0)
+  totalAmount   Float
+
+  paymentType PaymentType
+  description String?
+
+  spgTranId      String? @unique
+  merchantTranId String  @unique
+
+  status PaymentStatus @default(UNPAID)
+
+  spgResponse Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("payments")
 }
 
 model Event {
@@ -398,7 +438,7 @@ model Transaction {
   updatedAt   DateTime        @updatedAt
 }
 
-// ─── Enums ───────────────────────────────────────────────────────────────────
+// ─── Enums ────────────────────────────────────────────────────────────────────
 
 enum LeaveStatus {
   PENDING
@@ -409,6 +449,13 @@ enum LeaveStatus {
 enum TransactionType {
   CASH_IN
   CASH_OUT
+}
+
+enum PaymentType {
+  ADMISSION_FEE
+  SEMESTER_FEE
+  EXAM_FEE
+  OTHER
 }
 
 enum PaymentStatus {
