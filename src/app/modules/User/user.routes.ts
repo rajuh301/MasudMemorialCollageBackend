@@ -52,8 +52,8 @@ router.post(
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
     fileUploader.upload.single('file'),
     (req: Request, res: Response, next: NextFunction) => {
-        req.body = userValidation.createTeacher.parse(JSON.parse(req.body.data))
-        return userController.createTeacher(req, res, next)
+        req.body = userValidation.createOfficeStaff.parse(JSON.parse(req.body.data))
+        return userController.createOfficeStaff(req, res, next)
     }
 );
 

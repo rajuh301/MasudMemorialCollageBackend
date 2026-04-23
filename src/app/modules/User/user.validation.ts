@@ -48,13 +48,12 @@ const createTeacher = z.object({
         }),
     }),
 });
-
 const createOfficeStaff = z.object({
     password: z.string({
         required_error: "Password is required",
     }),
 
-    teacher: z.object({
+    officeStaff: z.object({   // ✅ FIXED
         name: z.string({
             required_error: "Name is required!",
         }),
@@ -76,6 +75,13 @@ const createOfficeStaff = z.object({
         address: z.string({
             required_error: "Address is required!",
         }),
+
+        // ✅ ADD THESE (VERY IMPORTANT)
+        dateOfBirth: z.string({
+            required_error: "Date of Birth is required!",
+        }),
+
+        faceDescriptor: z.array(z.number()).optional()
     }),
 });
 
