@@ -158,7 +158,6 @@ const createOfficeStaff = async (req: IAuthRequest): Promise<OfficeStaff> => {
 
                 // ✅ Required fields
                 dateOfBirth: dob,
-                faceDescriptor: req.body.officeStaff.faceDescriptor || [],
 
                 // ✅ Relations
                 createdById: validAdmin.id,
