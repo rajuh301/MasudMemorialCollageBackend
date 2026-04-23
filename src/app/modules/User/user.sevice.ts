@@ -1,4 +1,4 @@
-import { Admin, Prisma, Teacher, User, UserRole, UserStatus } from "@prisma/client";
+import { Admin, OfficeStaff, Prisma, Teacher, User, UserRole, UserStatus } from "@prisma/client";
 import * as bcrypt from 'bcrypt'
 import prisma from "../../../shared/prisma";
 import { fileUploader } from "../../../helpars/fileUploader";
@@ -105,6 +105,72 @@ const createTeacher = async (req: IAuthRequest): Promise<Teacher> => {
     return result;
 };
 
+
+
+const createOfficeStaff = async (req: IAuthRequest): Promise<OfficeStaff> => {
+    const file = req.file as IFile;
+
+    // ✅ 1. Handle image upload
+    if (file) {
+        req.body.officeStaff.profilePhoto = file.path;
+    }
+
+    // ✅ 2. Extract DOB and create default password (DD-MM-YYYY)
+    const dob = new Date(req.body.officeStaff.dateOfBirth);
+    const defaultPassword = `${dob.getDate()}-${dob.getMonth() + 1}-${dob.getFullYear()}`;
+
+    const hashedPassword: string = await bcrypt.hash(defaultPassword, 12);
+
+    // ✅ 3. Validate Admin
+    const adminEmail = req.user.email;
+
+    const validAdmin = await prisma.admin.findUnique({
+        where: { email: adminEmail }
+    });
+
+    if (!validAdmin) {
+        throw new Error("Cannot create office staff: Admin profile not found.");
+    }
+
+    // ✅ 4. Transaction
+    const result = await prisma.$transaction(async (tx) => {
+
+        // 🔹 Create User (for login)
+        const createdUser = await tx.user.create({
+            data: {
+                email: req.body.officeStaff.email,
+                password: hashedPassword,
+                role: UserRole.OFFICESTAFF,
+                contactNumber: req.body.officeStaff.contactNumber,
+                status: UserStatus.ACTIVE
+            }
+        });
+
+        // 🔹 Create OfficeStaff profile
+        const createdOfficeStaff = await tx.officeStaff.create({
+            data: {
+                name: req.body.officeStaff.name,
+                email: req.body.officeStaff.email,
+                contactNumber: req.body.officeStaff.contactNumber,
+                profilePhoto: req.body.officeStaff.profilePhoto || null,
+                joiningDate: new Date(req.body.officeStaff.joiningDate),
+                address: req.body.officeStaff.address,
+
+                // ✅ Required fields
+                dateOfBirth: dob,
+                faceDescriptor: req.body.officeStaff.faceDescriptor || [],
+
+                // ✅ Relations
+                createdById: validAdmin.id,
+                userId: createdUser.id
+            }
+        });
+
+        return createdOfficeStaff;
+    });
+
+    return result;
+};
 
 
 const getAllFromDB = async (params: any, options: IPaginationOptions) => {
@@ -300,5 +366,6 @@ export const userService = {
     updateMyProfie,
     createTeacher,
     getTotalUser,
-    getAllTeachers
+    getAllTeachers,
+    createOfficeStaff
 }

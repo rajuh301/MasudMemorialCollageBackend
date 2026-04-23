@@ -34,6 +34,21 @@ const createTeacher = catchAsync(async (req: Request, res: Response) => {
     })
 });
 
+
+const createOfficeStaff = catchAsync(async (req: Request, res: Response) => {
+    // assert that req is IAuthRequest
+    const authReq = req as IAuthRequest;
+
+    const result = await userService.createOfficeStaff(authReq);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Office Staff Created successfuly!",
+        data: result
+    })
+});
+
 const getTotalUser = catchAsync(async (req: Request, res: Response) => {
     const result = await userService.getTotalUser();
 
@@ -127,5 +142,6 @@ export const userController = {
     updateMyProfie,
     createTeacher,
     getTotalUser,
-    getAllTeachers
+    getAllTeachers,
+    createOfficeStaff
 }

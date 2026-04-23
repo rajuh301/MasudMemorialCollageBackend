@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post(
     "/create-student-comment",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF, UserRole.TEACHER),
     fileUploader.upload.single("file"),
     (req: Request, res: Response, next: NextFunction) => {
         req.body = StudentsCommentValidation.createStudentsCommentValidation.parse(
@@ -29,7 +29,7 @@ router.get("/:id", StudentsCommentController.getSingleStudentsComment);
 
 router.patch(
     "/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF, UserRole.TEACHER),
     fileUploader.upload.single("file"), // 1. Handle file
     (req: Request, res: Response, next: NextFunction) => {
         // 2. Parse and validate JSON from 'data' field
@@ -44,7 +44,7 @@ router.patch(
 
 
 router.delete("/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF, UserRole.TEACHER),
 
     StudentsCommentController.deleteStudentsComment);
 

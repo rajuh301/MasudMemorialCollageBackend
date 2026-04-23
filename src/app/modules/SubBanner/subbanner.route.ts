@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post(
   "/create-sub-banner",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = SubBannerValidation.createSubBannerValidation.parse(
@@ -31,12 +31,13 @@ router.get(
 
 router.get(
   "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   SubBannerController.getSingleSubBanner
 );
 
 router.patch(
   "/:id",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   fileUploader.upload.single("file"), // Added file handling
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -50,7 +51,7 @@ router.patch(
 
 router.delete(
   "/:id",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   SubBannerController.deleteSubBanner
 );
 

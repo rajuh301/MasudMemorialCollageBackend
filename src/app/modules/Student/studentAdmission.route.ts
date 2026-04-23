@@ -13,7 +13,7 @@ const router = express.Router();
 // Default password = dateOfBirth in DD/MM/YYYY format
 router.post(
   "/create",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -35,21 +35,21 @@ router.post(
 // ─── Get All Admissions (Admin) ───────────────────────────────────────────────
 router.get(
   "/",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   StudentAdmissionController.getAllStudentAdmissions
 );
 
 // ─── Get Single Admission ─────────────────────────────────────────────────────
 router.get(
   "/:id",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.STUDENT),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF, UserRole.STUDENT),
   StudentAdmissionController.getSingleStudentAdmission
 );
 
 // ─── Update Admission (Admin) ─────────────────────────────────────────────────
 router.patch(
   "/:id",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   fileUploader.upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     if (req.body.data) {
@@ -64,7 +64,7 @@ router.patch(
 // ─── Delete Admission (Admin) ─────────────────────────────────────────────────
 router.delete(
   "/:id",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   StudentAdmissionController.deleteStudentAdmission
 );
 
