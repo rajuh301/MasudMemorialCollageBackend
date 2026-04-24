@@ -15,6 +15,8 @@ import { AttendanceRoutes } from '../modules/Attendance/attendance.routes';
 import { NewsRoutes } from '../modules/News/news.route';
 import { ResultRoutes } from '../modules/Result/result.route';
 import { AccountRoutes } from '../modules/Account/account.route';
+import { LeaveRoutes } from '../modules/Leave/leave.route';
+import { GovermentBodyRoutes } from '../modules/Govermentbody/Govermentbody.route ';
 
 
 const router = express.Router();
@@ -85,6 +87,14 @@ const moduleRoutes = [
     {
         path: '/account',
         route: AccountRoutes
+    },
+    {
+        path: '/leave',
+        route: LeaveRoutes
+    },
+    {
+        path: '/goverment-body',
+        route: GovermentBodyRoutes
     },
   
 ];
