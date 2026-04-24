@@ -22,6 +22,7 @@ router.post(
         UserRole.ADMIN,
         UserRole.TEACHER,
         UserRole.STUDENT,
+        UserRole.OFFICESTAFF
    
     ),
     AuthController.changePassword

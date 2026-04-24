@@ -263,9 +263,12 @@ const getMyProfile = async (user: IAuthUser) => {
         select: {
             id: true,
             email: true,
-            needPasswordChange: true,
             role: true,
-            status: true
+            status: true,
+            admin: true,
+            officeStaff: true,
+            teacher: true
+
         }
     });
 
@@ -373,7 +376,7 @@ const getAllOfficeStaffs = async () => {
                     address: true
                 }
             }
-    
+
         }
     })
     return result;
