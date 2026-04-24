@@ -15,6 +15,20 @@ router.post(
 );
 
 router.get(
+    "/importent-notice",
+    NoticeController.getImportentNotic
+);
+
+router.get(
+    "/academic",
+    NoticeController.getAcademicNotice
+);
+router.get(
+    "/recent-notice",
+    NoticeController.getRecentNotice
+);
+
+router.get(
     "/",
     NoticeController.getNotice
 );
@@ -22,12 +36,6 @@ router.get(
 router.get(
     "/:id",
     NoticeController.getSingleNotice
-);
-
-
-router.get(
-    "/importent",
-    NoticeController.getImportentNotic
 );
 
 

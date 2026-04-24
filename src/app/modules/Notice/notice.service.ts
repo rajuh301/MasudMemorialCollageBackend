@@ -35,8 +35,8 @@ const getSingleNoticeFromDB = async (id: string) => {
 const getImportentNotic = async () => {
   const result = await prisma.notice.findMany({
     where: {
-      isImportant: true,
       isDeleted: false,
+      isImportant: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -45,7 +45,6 @@ const getImportentNotic = async () => {
 
   return result;
 };
-
 
 
 const updateNoticeIntoDB = async (id: string, payload: any) => {
@@ -72,11 +71,44 @@ const deleteNoticeFromDB = async (id: string) => {
   return result;
 };
 
+
+const getRecentNotice = async () => {
+  const result = await prisma.notice.findMany({
+    where: {
+      isDeleted: false,
+      isRecentNotice: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+
+  });
+  return result;
+};
+
+const getAcademicNotice = async () => {
+  const result = await prisma.notice.findMany({
+    where: {
+      isDeleted: false,
+      isAcademicNotice: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return result;
+};
+
+
+
 export const NoticeService = {
   createNoticeIntoDB,
   getNoticeFromDB,
   getSingleNoticeFromDB,
   updateNoticeIntoDB,
   deleteNoticeFromDB,
-  getImportentNotic
+  getImportentNotic,
+  getRecentNotice,
+  getAcademicNotice
 };

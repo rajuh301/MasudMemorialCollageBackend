@@ -69,6 +69,12 @@ router.get(
     userController.getAllTeachers
 )
 
+router.get(
+    "/get-all-students",
+    userController.getAllStudents
+)
+
+
 
 
 

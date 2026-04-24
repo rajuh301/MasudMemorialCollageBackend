@@ -382,6 +382,15 @@ const getAllOfficeStaffs = async () => {
     return result;
 }
 
+const getAllStudents = async () => {
+
+    const result = await prisma.studentAdmission.findMany({
+        where: { isDeleted: false }
+    })
+    return result;
+}
+
+
 
 export const userService = {
     createAdmin,
@@ -393,5 +402,6 @@ export const userService = {
     getTotalUser,
     getAllTeachers,
     createOfficeStaff,
-    getAllOfficeStaffs
+    getAllOfficeStaffs,
+    getAllStudents
 }

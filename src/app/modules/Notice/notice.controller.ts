@@ -80,6 +80,28 @@ const getImportentNotic = catchAsync(async (req: Request, res: Response) => {
   });
 })
 
+const getRecentNotice = catchAsync(async (req: Request, res: Response) => {
+  const result = await NoticeService.getRecentNotice();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Recent Notice fetched successfully",
+    data: result,
+  });
+});
+
+const getAcademicNotice = catchAsync(async (req: Request, res: Response) => {
+  const result = await NoticeService.getAcademicNotice();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Academic Notice fetched successfully",
+    data: result,
+  });
+});
+
 
 
 export const NoticeController = {
@@ -88,5 +110,7 @@ export const NoticeController = {
   getSingleNotice,
   updateNotice,
   deleteNotice,
-  getImportentNotic
+  getImportentNotic,
+  getRecentNotice,
+  getAcademicNotice
 };
