@@ -22,6 +22,9 @@ router.get(
   ResultController.getStudentResult
 );
 
+router.get("/public", ResultController.getPublicResult);
+
+
 // Latest results
 router.get("/latest", ResultController.getLatestResults);
 

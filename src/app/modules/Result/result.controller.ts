@@ -57,9 +57,21 @@ const getAllResults = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const getPublicResult = catchAsync(async (req: Request, res: Response) => {
+  const result = await ResultService.getPublicResultFromDB();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Public results fetched successfully",
+    data: result,
+  });
+});
+
 export const ResultController = {
   createResult,
   getStudentResult,
   getLatestResults,
   getAllResults,
+  getPublicResult
 };

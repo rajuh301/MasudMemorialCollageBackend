@@ -57,6 +57,11 @@ router.post(
     }
 );
 
+router.get("/get-staffs",
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT),
+    userController.getAllOfficeStaffs
+)
+
 
 router.get(
     "/get-all-teachers",

@@ -134,6 +134,18 @@ const getAllTeachers = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+const getAllOfficeStaffs = catchAsync(async (req: Request, res: Response) => {
+    const result = await userService.getAllOfficeStaffs();
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Office Staffs data fetched!",
+        data: result
+    })
+});
+
+
+
 export const userController = {
     createAdmin,
     getAllFromDB,
@@ -143,5 +155,6 @@ export const userController = {
     createTeacher,
     getTotalUser,
     getAllTeachers,
-    createOfficeStaff
+    createOfficeStaff,
+    getAllOfficeStaffs
 }

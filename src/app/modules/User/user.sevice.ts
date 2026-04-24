@@ -355,6 +355,30 @@ const getAllTeachers = async () => {
     return result;
 }
 
+const getAllOfficeStaffs = async () => {
+
+    const result = await prisma.user.findMany({
+        where: {
+            role: UserRole.OFFICESTAFF
+        },
+        select: {
+            id: true,
+            email: true,
+            contactNumber: true,
+            officeStaff: {
+                select: {
+                    name: true,
+                    profilePhoto: true,
+                    joiningDate: true,
+                    address: true
+                }
+            }
+    
+        }
+    })
+    return result;
+}
+
 
 export const userService = {
     createAdmin,
@@ -365,5 +389,6 @@ export const userService = {
     createTeacher,
     getTotalUser,
     getAllTeachers,
-    createOfficeStaff
+    createOfficeStaff,
+    getAllOfficeStaffs
 }
