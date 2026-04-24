@@ -102,6 +102,15 @@ const getAcademicNotice = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getOfficalNotice = catchAsync(async (req: Request, res: Response) => {
+  const result = await NoticeService.getOfficalNotice();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Offical Notice fetched successfully",
+    data: result,
+  });
+});
 
 
 export const NoticeController = {
@@ -112,5 +121,6 @@ export const NoticeController = {
   deleteNotice,
   getImportentNotic,
   getRecentNotice,
-  getAcademicNotice
+  getAcademicNotice,
+  getOfficalNotice
 };

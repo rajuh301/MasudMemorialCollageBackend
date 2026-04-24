@@ -90,7 +90,7 @@ const getAcademicNotice = async () => {
   const result = await prisma.notice.findMany({
     where: {
       isDeleted: false,
-      isAcademicNotice: true,
+      isAcademicNotic: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -101,6 +101,18 @@ const getAcademicNotice = async () => {
 };
 
 
+const getOfficalNotice = async () => {
+  const result = await prisma.notice.findMany({
+    where: {
+      isDeleted: false,
+      isOfficialNotic: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return result;
+};
 
 export const NoticeService = {
   createNoticeIntoDB,
@@ -110,5 +122,6 @@ export const NoticeService = {
   deleteNoticeFromDB,
   getImportentNotic,
   getRecentNotice,
-  getAcademicNotice
+  getAcademicNotice,
+  getOfficalNotice
 };

@@ -14,19 +14,10 @@ router.post(
     NoticeController.createNotice
 );
 
-router.get(
-    "/importent-notice",
-    NoticeController.getImportentNotic
-);
-
-router.get(
-    "/academic",
-    NoticeController.getAcademicNotice
-);
-router.get(
-    "/recent-notice",
-    NoticeController.getRecentNotice
-);
+router.get("/importent-notice", NoticeController.getImportentNotic);
+router.get("/academic", NoticeController.getAcademicNotice);
+router.get("/recent-notice", NoticeController.getRecentNotice);
+router.get("/offical-notice", NoticeController.getOfficalNotice);
 
 router.get(
     "/",
