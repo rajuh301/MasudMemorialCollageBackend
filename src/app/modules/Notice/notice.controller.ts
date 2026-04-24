@@ -68,10 +68,25 @@ const deleteNotice = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const getImportentNotic = catchAsync(async (req: Request, res: Response) => {
+  const result = await NoticeService.getImportentNotic();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Importent Notice fetched successfully",
+    data: result,
+  });
+})
+
+
+
 export const NoticeController = {
   createNotice,
   getNotice,
   getSingleNotice,
   updateNotice,
   deleteNotice,
+  getImportentNotic
 };

@@ -22,7 +22,7 @@ router.get(
 
 router.get(
     '/me',
-    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT),
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT, UserRole.OFFICESTAFF),
     userController.getMyProfile
 )
 

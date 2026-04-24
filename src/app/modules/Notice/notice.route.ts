@@ -9,14 +9,13 @@ const router = express.Router();
 
 router.post(
     "/create-notice",
-    auth(UserRole.SUPER_ADMIN, UserRole.OFFICESTAFF, UserRole.ADMIN),
+    auth(UserRole.SUPER_ADMIN, UserRole.OFFICESTAFF, UserRole.ADMIN, UserRole.TEACHER),
     validateRequest(NoticeValidation.createNoticeValidation),
     NoticeController.createNotice
 );
 
 router.get(
     "/",
-    auth(UserRole.SUPER_ADMIN, UserRole.OFFICESTAFF, UserRole.ADMIN),
     NoticeController.getNotice
 );
 
@@ -25,16 +24,24 @@ router.get(
     NoticeController.getSingleNotice
 );
 
+
+router.get(
+    "/importent",
+    NoticeController.getImportentNotic
+);
+
+
+
 router.patch(
     "/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.OFFICESTAFF, UserRole.ADMIN),
+    auth(UserRole.SUPER_ADMIN, UserRole.OFFICESTAFF, UserRole.ADMIN, UserRole.TEACHER),
     validateRequest(NoticeValidation.updateNoticeValidation),
     NoticeController.updateNotice
 );
 
 router.delete(
     "/:id",
-    auth(UserRole.SUPER_ADMIN, UserRole.OFFICESTAFF, UserRole.ADMIN),
+    auth(UserRole.SUPER_ADMIN, UserRole.OFFICESTAFF, UserRole.ADMIN, UserRole.TEACHER),
     NoticeController.deleteNotice
 );
 
