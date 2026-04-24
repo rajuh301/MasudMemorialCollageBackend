@@ -114,11 +114,11 @@ const createOfficeStaff = async (req: IAuthRequest): Promise<OfficeStaff> => {
     if (file) {
         req.body.officeStaff.profilePhoto = file.path;
     }
+    const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
     // ✅ 2. Extract DOB and create default password (DD-MM-YYYY)
     const dob = new Date(req.body.officeStaff.dateOfBirth);
 
-    const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
     // ✅ 3. Validate Admin
     const adminEmail = req.user.email;

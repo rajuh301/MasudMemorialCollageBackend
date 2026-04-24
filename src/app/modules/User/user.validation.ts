@@ -81,7 +81,6 @@ const createOfficeStaff = z.object({
             required_error: "Date of Birth is required!",
         }),
 
-        faceDescriptor: z.array(z.number()).optional()
     }),
 });
 
