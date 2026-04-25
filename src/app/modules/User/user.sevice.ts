@@ -267,7 +267,8 @@ const getMyProfile = async (user: IAuthUser) => {
             status: true,
             admin: true,
             officeStaff: true,
-            teacher: true
+            teacher: true,
+            studentAdmission: true
 
         }
     });

@@ -18,14 +18,14 @@ router.post(
 // Get all leaves (admin only)
 router.get(
   "/",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.STUDENT, UserRole.TEACHER, UserRole.OFFICESTAFF),
   LeaveController.getAllLeaves
 );
 
 // Get my own leaves (any authenticated user)
 router.get(
   "/my-leaves",
-  auth(UserRole.STUDENT, UserRole.TEACHER, UserRole.OFFICESTAFF),
+  auth(UserRole.STUDENT, UserRole.TEACHER, UserRole.OFFICESTAFF, UserRole.SUPER_ADMIN, UserRole.ADMIN),
   LeaveController.getMyLeaves
 );
 
