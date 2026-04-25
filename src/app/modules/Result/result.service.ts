@@ -96,20 +96,24 @@ const getLatestResultsFromDB = async () => {
 
 const getAllResultsFromDB = async () => {
   return prisma.result.findMany({
-    include: {
+
+    select: {
       id: true,
       studentRoll: true,
       subject: true,
-      department: true,
-      student: {
+      marks: true,
+      grade: true,
+      examType: true,
+      academicYear: true,
+      createdAt: true,
+      department: {
         select: {
-          firstName: true,
-          lastName: true,
-          dateofBirth: true,
+          name: true,
         }
       }
     },
     orderBy: { createdAt: "desc" },
+
   });
 };
 
@@ -183,12 +187,16 @@ const getResultRecordsFromDB = async () => {
   });
 };
 
-const deleteResult = async (id: string) => {
-  return prisma.result.delete({
-    where: { id },
-  });
-};
 
+const deleteResult = async (id: string) => {
+
+  return prisma.result.delete({
+    where: {
+      id,
+    },
+  });
+
+}
 
 
 

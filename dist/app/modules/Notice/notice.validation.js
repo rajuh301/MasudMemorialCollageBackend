@@ -16,6 +16,12 @@ const createNoticeValidation = zod_1.z.object({
         isRecentNotice: zod_1.z.boolean({
             required_error: "isRecentNotice is required",
         }),
+        isOfficialNotic: zod_1.z.boolean({
+            required_error: "isOfficial is required",
+        }),
+        isAcademicNotic: zod_1.z.boolean({
+            required_error: "isAccademic is required",
+        }),
         date: zod_1.z.string({
             required_error: "Date is required",
         }),
@@ -27,6 +33,8 @@ const updateNoticeValidation = zod_1.z.object({
         description: zod_1.z.string().optional(),
         isImportant: zod_1.z.boolean().optional(),
         isRecentNotice: zod_1.z.boolean().optional(),
+        isOfficialNotic: zod_1.z.boolean().optional(),
+        isAcademicNotic: zod_1.z.boolean().optional(),
         date: zod_1.z.string().optional(),
     }),
 });

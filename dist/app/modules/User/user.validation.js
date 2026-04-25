@@ -43,6 +43,34 @@ const createTeacher = zod_1.z.object({
         }),
     }),
 });
+const createOfficeStaff = zod_1.z.object({
+    password: zod_1.z.string({
+        required_error: "Password is required",
+    }),
+    officeStaff: zod_1.z.object({
+        name: zod_1.z.string({
+            required_error: "Name is required!",
+        }),
+        email: zod_1.z
+            .string({
+            required_error: "Email is required!",
+        })
+            .email(),
+        contactNumber: zod_1.z.string({
+            required_error: "Contact Number is required!",
+        }),
+        joiningDate: zod_1.z.string({
+            required_error: "Joining Date is required!",
+        }),
+        address: zod_1.z.string({
+            required_error: "Address is required!",
+        }),
+        // ✅ ADD THESE (VERY IMPORTANT)
+        dateOfBirth: zod_1.z.string({
+            required_error: "Date of Birth is required!",
+        }),
+    }),
+});
 const updateStatus = zod_1.z.object({
     body: zod_1.z.object({
         status: zod_1.z.enum([client_1.UserStatus.ACTIVE, client_1.UserStatus.BLOCKED, client_1.UserStatus.DELETED])
@@ -51,5 +79,6 @@ const updateStatus = zod_1.z.object({
 exports.userValidation = {
     createAdmin,
     updateStatus,
-    createTeacher
+    createTeacher,
+    createOfficeStaff
 };

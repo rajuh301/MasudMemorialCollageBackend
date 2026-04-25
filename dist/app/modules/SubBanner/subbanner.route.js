@@ -11,18 +11,18 @@ const auth_1 = __importDefault(require("../../middlewares/auth"));
 const fileUploader_1 = require("../../../helpars/fileUploader");
 const subbanner_validatio_1 = require("./subbanner.validatio");
 const router = express_1.default.Router();
-router.post("/create-sub-banner", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), fileUploader_1.fileUploader.upload.single("file"), (req, res, next) => {
+router.post("/create-sub-banner", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN, client_1.UserRole.OFFICESTAFF), fileUploader_1.fileUploader.upload.single("file"), (req, res, next) => {
     req.body = subbanner_validatio_1.SubBannerValidation.createSubBannerValidation.parse(JSON.parse(req.body.data));
     return subbanner_controller_1.SubBannerController.createSubBanner(req, res, next);
 });
 router.get("/", subbanner_controller_1.SubBannerController.getSubBanner);
-router.get("/:id", subbanner_controller_1.SubBannerController.getSingleSubBanner);
-router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), fileUploader_1.fileUploader.upload.single("file"), // Added file handling
+router.get("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN, client_1.UserRole.OFFICESTAFF), subbanner_controller_1.SubBannerController.getSingleSubBanner);
+router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN, client_1.UserRole.OFFICESTAFF), fileUploader_1.fileUploader.upload.single("file"), // Added file handling
 (req, res, next) => {
     if (req.body.data) {
         req.body = subbanner_validatio_1.SubBannerValidation.updateSubBannerValidation.parse(JSON.parse(req.body.data));
     }
     return subbanner_controller_1.SubBannerController.updateSubBanner(req, res, next);
 });
-router.delete("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), subbanner_controller_1.SubBannerController.deleteSubBanner);
+router.delete("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN, client_1.UserRole.OFFICESTAFF), subbanner_controller_1.SubBannerController.deleteSubBanner);
 exports.SubBannerRoutes = router;

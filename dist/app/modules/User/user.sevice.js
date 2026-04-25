@@ -137,6 +137,55 @@ const createTeacher = (req) => __awaiter(void 0, void 0, void 0, function* () {
     }));
     return result;
 });
+const createOfficeStaff = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const file = req.file;
+    // ✅ 1. Handle image upload
+    if (file) {
+        req.body.officeStaff.profilePhoto = file.path;
+    }
+    const hashedPassword = yield bcrypt.hash(req.body.password, 12);
+    // ✅ 2. Extract DOB and create default password (DD-MM-YYYY)
+    const dob = new Date(req.body.officeStaff.dateOfBirth);
+    // ✅ 3. Validate Admin
+    const adminEmail = req.user.email;
+    const validAdmin = yield prisma_1.default.admin.findUnique({
+        where: { email: adminEmail }
+    });
+    if (!validAdmin) {
+        throw new Error("Cannot create office staff: Admin profile not found.");
+    }
+    // ✅ 4. Transaction
+    const result = yield prisma_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // 🔹 Create User (for login)
+        const createdUser = yield tx.user.create({
+            data: {
+                email: req.body.officeStaff.email,
+                password: hashedPassword,
+                role: client_1.UserRole.OFFICESTAFF,
+                contactNumber: req.body.officeStaff.contactNumber,
+                status: client_1.UserStatus.ACTIVE
+            }
+        });
+        // 🔹 Create OfficeStaff profile
+        const createdOfficeStaff = yield tx.officeStaff.create({
+            data: {
+                name: req.body.officeStaff.name,
+                email: req.body.officeStaff.email,
+                contactNumber: req.body.officeStaff.contactNumber,
+                profilePhoto: req.body.officeStaff.profilePhoto || null,
+                joiningDate: new Date(req.body.officeStaff.joiningDate),
+                address: req.body.officeStaff.address,
+                // ✅ Required fields
+                dateOfBirth: dob,
+                // ✅ Relations
+                createdById: validAdmin.id,
+                userId: createdUser.id
+            }
+        });
+        return createdOfficeStaff;
+    }));
+    return result;
+});
 const getAllFromDB = (params, options) => __awaiter(void 0, void 0, void 0, function* () {
     const { page, limit, skip } = paginationHelper_1.paginationHelper.calculatePagination(options);
     const { searchTerm } = params, filterData = __rest(params, ["searchTerm"]);
@@ -219,9 +268,12 @@ const getMyProfile = (user) => __awaiter(void 0, void 0, void 0, function* () {
         select: {
             id: true,
             email: true,
-            needPasswordChange: true,
             role: true,
-            status: true
+            status: true,
+            admin: true,
+            officeStaff: true,
+            teacher: true,
+            studentAdmission: true
         }
     });
     let profileInfo;
@@ -288,6 +340,33 @@ const getAllTeachers = () => __awaiter(void 0, void 0, void 0, function* () {
     });
     return result;
 });
+const getAllOfficeStaffs = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.user.findMany({
+        where: {
+            role: client_1.UserRole.OFFICESTAFF
+        },
+        select: {
+            id: true,
+            email: true,
+            contactNumber: true,
+            officeStaff: {
+                select: {
+                    name: true,
+                    profilePhoto: true,
+                    joiningDate: true,
+                    address: true
+                }
+            }
+        }
+    });
+    return result;
+});
+const getAllStudents = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.studentAdmission.findMany({
+        where: { isDeleted: false }
+    });
+    return result;
+});
 exports.userService = {
     createAdmin,
     getAllFromDB,
@@ -296,5 +375,8 @@ exports.userService = {
     updateMyProfie,
     createTeacher,
     getTotalUser,
-    getAllTeachers
+    getAllTeachers,
+    createOfficeStaff,
+    getAllOfficeStaffs,
+    getAllStudents
 };

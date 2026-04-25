@@ -39,6 +39,17 @@ const createTeacher = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: result
     });
 }));
+const createOfficeStaff = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // assert that req is IAuthRequest
+    const authReq = req;
+    const result = yield user_sevice_1.userService.createOfficeStaff(authReq);
+    (0, sendResponse_1.default)(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Office Staff Created successfuly!",
+        data: result
+    });
+}));
 const getTotalUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield user_sevice_1.userService.getTotalUser();
     (0, sendResponse_1.default)(res, {
@@ -99,6 +110,24 @@ const getAllTeachers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: result
     });
 }));
+const getAllOfficeStaffs = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_sevice_1.userService.getAllOfficeStaffs();
+    (0, sendResponse_1.default)(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Office Staffs data fetched!",
+        data: result
+    });
+}));
+const getAllStudents = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_sevice_1.userService.getAllStudents();
+    (0, sendResponse_1.default)(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Students data fetched!",
+        data: result
+    });
+}));
 exports.userController = {
     createAdmin,
     getAllFromDB,
@@ -107,5 +136,8 @@ exports.userController = {
     updateMyProfie,
     createTeacher,
     getTotalUser,
-    getAllTeachers
+    getAllTeachers,
+    createOfficeStaff,
+    getAllOfficeStaffs,
+    getAllStudents
 };

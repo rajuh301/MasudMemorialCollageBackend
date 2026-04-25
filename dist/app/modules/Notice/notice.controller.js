@@ -66,10 +66,50 @@ const deleteNotice = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         data: result,
     });
 }));
+const getImportentNotic = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield notice_service_1.NoticeService.getImportentNotic();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Importent Notice fetched successfully",
+        data: result,
+    });
+}));
+const getRecentNotice = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield notice_service_1.NoticeService.getRecentNotice();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Recent Notice fetched successfully",
+        data: result,
+    });
+}));
+const getAcademicNotice = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield notice_service_1.NoticeService.getAcademicNotice();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Academic Notice fetched successfully",
+        data: result,
+    });
+}));
+const getOfficalNotice = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield notice_service_1.NoticeService.getOfficalNotice();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Offical Notice fetched successfully",
+        data: result,
+    });
+}));
 exports.NoticeController = {
     createNotice,
     getNotice,
     getSingleNotice,
     updateNotice,
     deleteNotice,
+    getImportentNotic,
+    getRecentNotice,
+    getAcademicNotice,
+    getOfficalNotice
 };

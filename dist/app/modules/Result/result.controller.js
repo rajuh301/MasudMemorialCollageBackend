@@ -58,9 +58,40 @@ const getAllResults = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: result,
     });
 }));
+const getPublicResult = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield result_service_1.ResultService.getPublicResultFromDB();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Public results fetched successfully",
+        data: result,
+    });
+}));
+const getResultRecords = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield result_service_1.ResultService.getResultRecordsFromDB();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Result records fetched successfully",
+        data: result,
+    });
+}));
+const deleteResult = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield result_service_1.ResultService.deleteResult(id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Result deleted successfully",
+        data: result,
+    });
+}));
 exports.ResultController = {
     createResult,
     getStudentResult,
     getLatestResults,
     getAllResults,
+    getPublicResult,
+    getResultRecords,
+    deleteResult
 };

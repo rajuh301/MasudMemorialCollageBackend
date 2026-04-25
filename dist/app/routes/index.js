@@ -20,6 +20,8 @@ const attendance_routes_1 = require("../modules/Attendance/attendance.routes");
 const news_route_1 = require("../modules/News/news.route");
 const result_route_1 = require("../modules/Result/result.route");
 const account_route_1 = require("../modules/Account/account.route");
+const leave_route_1 = require("../modules/Leave/leave.route");
+const Govermentbody_route_1 = require("../modules/Govermentbody/Govermentbody.route ");
 const router = express_1.default.Router();
 const moduleRoutes = [
     {
@@ -85,6 +87,14 @@ const moduleRoutes = [
     {
         path: '/account',
         route: account_route_1.AccountRoutes
+    },
+    {
+        path: '/leave',
+        route: leave_route_1.LeaveRoutes
+    },
+    {
+        path: '/goverment-body',
+        route: Govermentbody_route_1.GovermentBodyRoutes
     },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

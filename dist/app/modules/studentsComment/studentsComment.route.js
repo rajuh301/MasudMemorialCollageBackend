@@ -11,13 +11,13 @@ const client_1 = require("@prisma/client");
 const studentsComment_validation_1 = require("./studentsComment.validation");
 const fileUploader_1 = require("../../../helpars/fileUploader");
 const router = express_1.default.Router();
-router.post("/create-student-comment", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), fileUploader_1.fileUploader.upload.single("file"), (req, res, next) => {
+router.post("/create-student-comment", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN, client_1.UserRole.OFFICESTAFF, client_1.UserRole.TEACHER), fileUploader_1.fileUploader.upload.single("file"), (req, res, next) => {
     req.body = studentsComment_validation_1.StudentsCommentValidation.createStudentsCommentValidation.parse(JSON.parse(req.body.data));
     return studentsComment_controller_1.StudentsCommentController.createStudentsComment(req, res, next);
 });
 router.get("/", studentsComment_controller_1.StudentsCommentController.getStudentsComment);
 router.get("/:id", studentsComment_controller_1.StudentsCommentController.getSingleStudentsComment);
-router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), fileUploader_1.fileUploader.upload.single("file"), // 1. Handle file
+router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN, client_1.UserRole.OFFICESTAFF, client_1.UserRole.TEACHER), fileUploader_1.fileUploader.upload.single("file"), // 1. Handle file
 (req, res, next) => {
     // 2. Parse and validate JSON from 'data' field
     if (req.body.data) {
@@ -25,5 +25,5 @@ router.patch("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1
     }
     return studentsComment_controller_1.StudentsCommentController.updateStudentsComment(req, res, next);
 });
-router.delete("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), studentsComment_controller_1.StudentsCommentController.deleteStudentsComment);
+router.delete("/:id", (0, auth_1.default)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN, client_1.UserRole.OFFICESTAFF, client_1.UserRole.TEACHER), studentsComment_controller_1.StudentsCommentController.deleteStudentsComment);
 exports.StudentsCommentRoutes = router;

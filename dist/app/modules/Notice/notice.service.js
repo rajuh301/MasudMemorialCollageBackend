@@ -39,6 +39,18 @@ const getSingleNoticeFromDB = (id) => __awaiter(void 0, void 0, void 0, function
     });
     return result;
 });
+const getImportentNotic = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.notice.findMany({
+        where: {
+            isDeleted: false,
+            isImportant: true,
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+    return result;
+});
 const updateNoticeIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield prisma_1.default.notice.update({
         where: {
@@ -59,10 +71,50 @@ const deleteNoticeFromDB = (id) => __awaiter(void 0, void 0, void 0, function* (
     });
     return result;
 });
+const getRecentNotice = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.notice.findMany({
+        where: {
+            isDeleted: false,
+            isRecentNotice: true,
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+    return result;
+});
+const getAcademicNotice = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.notice.findMany({
+        where: {
+            isDeleted: false,
+            isAcademicNotic: true,
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+    return result;
+});
+const getOfficalNotice = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.notice.findMany({
+        where: {
+            isDeleted: false,
+            isOfficialNotic: true,
+        },
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+    return result;
+});
 exports.NoticeService = {
     createNoticeIntoDB,
     getNoticeFromDB,
     getSingleNoticeFromDB,
     updateNoticeIntoDB,
     deleteNoticeFromDB,
+    getImportentNotic,
+    getRecentNotice,
+    getAcademicNotice,
+    getOfficalNotice
 };
