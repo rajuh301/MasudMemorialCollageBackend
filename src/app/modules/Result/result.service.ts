@@ -183,6 +183,13 @@ const getResultRecordsFromDB = async () => {
   });
 };
 
+const deleteResult = async (id: string) => {
+  return prisma.result.delete({
+    where: { id },
+  });
+};
+
+
 
 
 export const ResultService = {
@@ -191,5 +198,6 @@ export const ResultService = {
   getLatestResultsFromDB,
   getAllResultsFromDB,
   getPublicResultFromDB,
-  getResultRecordsFromDB
+  getResultRecordsFromDB,
+  deleteResult
 };

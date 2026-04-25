@@ -80,6 +80,17 @@ const getResultRecords = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteResult = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await ResultService.deleteResult(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Result deleted successfully",
+    data: result,
+  });
+});
+
 
 export const ResultController = {
   createResult,
@@ -87,5 +98,6 @@ export const ResultController = {
   getLatestResults,
   getAllResults,
   getPublicResult,
-  getResultRecords
+  getResultRecords,
+  deleteResult
 };

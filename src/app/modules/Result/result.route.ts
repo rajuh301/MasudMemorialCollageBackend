@@ -33,4 +33,9 @@ router.get("/latest", ResultController.getLatestResults);
 // All results
 router.get("/", ResultController.getAllResults);
 
+router.delete("/delete-result/:id",
+
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
+  ResultController.deleteResult);
+
 export const ResultRoutes = router;
