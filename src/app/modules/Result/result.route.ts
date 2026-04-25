@@ -22,6 +22,8 @@ router.get(
   ResultController.getStudentResult
 );
 
+router.get("/result-records", ResultController.getResultRecords);
+
 router.get("/public", ResultController.getPublicResult);
 
 

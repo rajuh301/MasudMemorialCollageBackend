@@ -96,7 +96,19 @@ const getLatestResultsFromDB = async () => {
 
 const getAllResultsFromDB = async () => {
   return prisma.result.findMany({
-    include: { department: true },
+    include: {
+      id: true,
+      studentRoll: true,
+      subject: true,
+      department: true,
+      student: {
+        select: {
+          firstName: true,
+          lastName: true,
+          dateofBirth: true,
+        }
+      }
+    },
     orderBy: { createdAt: "desc" },
   });
 };
@@ -164,6 +176,13 @@ const getPublicResultFromDB = async () => {
   }));
 };
 
+const getResultRecordsFromDB = async () => {
+  return prisma.result.findMany({
+    include: { department: true },
+    orderBy: { createdAt: "desc" },
+  });
+};
+
 
 
 export const ResultService = {
@@ -171,5 +190,6 @@ export const ResultService = {
   getStudentResultFromDB,
   getLatestResultsFromDB,
   getAllResultsFromDB,
-  getPublicResultFromDB
+  getPublicResultFromDB,
+  getResultRecordsFromDB
 };
