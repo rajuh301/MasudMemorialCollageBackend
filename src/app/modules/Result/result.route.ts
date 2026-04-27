@@ -21,6 +21,7 @@ router.get(
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF, UserRole.TEACHER, UserRole.STUDENT),
   ResultController.getStudentResult
 );
+router.get("/", ResultController.getAllResults);
 
 router.get("/result-records", ResultController.getResultRecords);
 
@@ -31,7 +32,6 @@ router.get("/public", ResultController.getPublicResult);
 router.get("/latest", ResultController.getLatestResults);
 
 // All results
-router.get("/", ResultController.getAllResults);
 
 router.delete("/delete-result/:id",
 

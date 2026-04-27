@@ -35,19 +35,32 @@ const createResultIntoDB = async (payload: any) => {
   return result;
 };
 
-
-
 const getStudentResultFromDB = async (roll: string, departmentId: string) => {
-  const results = await prisma.result.findMany({
-    where: {
-      studentRoll: roll,
-      departmentId: departmentId,
-    },
-    include: { department: true },
-    orderBy: { createdAt: "desc" },
-  });
+  // ✅ Both DB calls at the same time
+  const [results, student] = await Promise.all([
+    prisma.result.findMany({
+      where: {
+        studentRoll: roll,
+        departmentId: departmentId,
+      },
+      include: { department: true },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.studentAdmission.findFirst({  // ✅ findFirst instead of findMany
+      where: { studentRoll: roll },
+      select: {
+        firstName: true,
+        lastName: true,
+      },
+    }),
+  ]);
 
   if (!results.length) throw new Error("No result found for this student");
+
+  // ✅ Clean student name string
+  const studentName = student
+    ? `${student.firstName} ${student.lastName}`
+    : "Unknown";
 
   // ✅ Group by examType + academicYear
   const grouped: Record<string, any> = {};
@@ -57,6 +70,8 @@ const getStudentResultFromDB = async (roll: string, departmentId: string) => {
 
     if (!grouped[key]) {
       grouped[key] = {
+        id: r.id,
+        roll: r.studentRoll,
         exam: r.examType,
         department: r.department?.name || "N/A",
         year: r.academicYear,
@@ -74,11 +89,12 @@ const getStudentResultFromDB = async (roll: string, departmentId: string) => {
   // ✅ Final clean response
   return Object.values(grouped).map((item) => ({
     id: item.id,
+    roll: item.roll,
+    studentName,         // ✅ "Rahim Hossain" — clean string
     exam: item.exam,
     department: item.department,
     year: item.year,
     subjects: item.subjects,
-
   }));
 };
 
