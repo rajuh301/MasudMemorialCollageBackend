@@ -73,10 +73,12 @@ const getStudentResultFromDB = async (roll: string, departmentId: string) => {
 
   // ✅ Final clean response
   return Object.values(grouped).map((item) => ({
+    id: item.id,
     exam: item.exam,
     department: item.department,
     year: item.year,
     subjects: item.subjects,
+
   }));
 };
 
