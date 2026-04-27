@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.post(
   "/create-news",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   validateRequest(createNewsValidation),
   NewsController.createNews
 );
@@ -37,7 +37,7 @@ router.get(
 
 router.patch(
   "/:id",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   validateRequest(updateNewsValidation),
   NewsController.updateNews
 );
@@ -46,7 +46,7 @@ router.patch(
 
 router.delete(
   "/:id",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   NewsController.deleteNews
 );
 
