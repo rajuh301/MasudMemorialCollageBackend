@@ -75,9 +75,6 @@ router.get(
 )
 
 
-
-
-
 router.patch(
     '/:id/status',
     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
@@ -94,6 +91,13 @@ router.patch(
         return userController.updateMyProfie(req, res, next)
     }
 );
+
+
+router.delete('/:id',
+    auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.OFFICESTAFF),
+    userController.deleteUser
+
+)
 
 
 export const userRoutes = router;

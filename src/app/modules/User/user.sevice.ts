@@ -392,6 +392,18 @@ const getAllStudents = async () => {
 }
 
 
+const deleteUser = async (userId: any) => {
+    const result = await prisma.user.update({
+        where: {
+            id: userId
+        },
+        data: {
+            isDeleted: true
+        }
+    });
+
+    return result;
+};
 
 export const userService = {
     createAdmin,
@@ -404,5 +416,6 @@ export const userService = {
     getAllTeachers,
     createOfficeStaff,
     getAllOfficeStaffs,
-    getAllStudents
+    getAllStudents,
+    deleteUser
 }

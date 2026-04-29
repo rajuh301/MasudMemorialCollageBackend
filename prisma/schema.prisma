@@ -19,6 +19,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  isDeleted Boolean @default(false)
+
   admin            Admin?
   teacher          Teacher?
   student          Student?
