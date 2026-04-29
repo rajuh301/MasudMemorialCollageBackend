@@ -398,7 +398,7 @@ const deleteUser = async (userId: any) => {
             id: userId
         },
         data: {
-            isDeleted: true
+            status: "DELETED"
         }
     });
 
