@@ -375,7 +375,6 @@ const getAllOfficeStaffs = async () => {
     const result = await prisma.user.findMany({
         where: {
             role: UserRole.OFFICESTAFF,
-            status: { not: UserStatus.DELETED }, // ✅ User-level check
             officeStaff: {
                 isDeleted: false  // ✅ Relation-level check
             }
