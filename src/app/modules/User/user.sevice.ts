@@ -333,8 +333,20 @@ const updateMyProfie = async (user: IAuthUser, req: Request) => {
 
 const getTotalUser = async () => {
 
-    const teacher = (await prisma.teacher.findMany()).length;
-    const student = (await prisma.studentAdmission.findMany()).length;
+    const teacher = (await prisma.teacher.findMany({
+        where: {
+            isDeleted: false
+        }
+    })).length;
+
+
+    const student = (await prisma.studentAdmission.findMany({
+        where: {
+            isDeleted: false
+        }
+    })).length;
+
+
     const department = (await prisma.department.findMany()).length;
 
 
@@ -362,7 +374,11 @@ const getAllOfficeStaffs = async () => {
 
     const result = await prisma.user.findMany({
         where: {
-            role: UserRole.OFFICESTAFF
+            role: UserRole.OFFICESTAFF,
+            status: { not: UserStatus.DELETED }, // ✅ User-level check
+            officeStaff: {
+                isDeleted: false  // ✅ Relation-level check
+            }
         },
         select: {
             id: true,
