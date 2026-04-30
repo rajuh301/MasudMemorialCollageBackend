@@ -91,6 +91,7 @@ const createTeacher = async (req: IAuthRequest): Promise<Teacher> => {
                 name: req.body.teacher.name,
                 email: req.body.teacher.email,
                 contactNumber: req.body.teacher.contactNumber,
+                designation: req.body.teacher.designation,
                 profilePhoto: req.body.teacher.profilePhoto || null, // ✅ ক্লাউডিনারি URL
                 joiningDate: new Date(req.body.teacher.joiningDate),
                 address: req.body.teacher.address,
@@ -154,6 +155,7 @@ const createOfficeStaff = async (req: IAuthRequest): Promise<OfficeStaff> => {
                 profilePhoto: req.body.officeStaff.profilePhoto || null,
                 joiningDate: new Date(req.body.officeStaff.joiningDate),
                 address: req.body.officeStaff.address,
+                designation: req.body.officeStaff.designation,
 
                 // ✅ Required fields
                 dateOfBirth: dob,

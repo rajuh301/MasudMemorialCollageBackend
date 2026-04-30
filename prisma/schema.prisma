@@ -19,7 +19,6 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-
   admin            Admin?
   teacher          Teacher?
   student          Student?
@@ -58,6 +57,7 @@ model Teacher {
   joiningDate    DateTime
   address        String
   faceDescriptor Float[]
+  designation    String
 
   createdById String
   createdBy   Admin? @relation("AdminToTeacher", fields: [createdById], references: [id])
@@ -91,6 +91,7 @@ model OfficeStaff {
   // Default password is built from dateOfBirth (DD/MM/YYYY)
   dateOfBirth DateTime
 
+  designation String
   createdById String
   createdBy   Admin? @relation("AdminToOfficeStaff", fields: [createdById], references: [id])
 
@@ -320,7 +321,7 @@ model Leave {
   officeStaff   OfficeStaff? @relation("OfficeStaffToLeave", fields: [officeStaffId], references: [id])
 
   approvedById String?
-  approvedBy   Admin? @relation("AdminToLeave", fields: [approvedById], references: [id])
+  approvedBy   Admin?  @relation("AdminToLeave", fields: [approvedById], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -337,7 +338,7 @@ model Payment {
   studentPhone String
 
   amount        Float
-  serviceCharge Float  @default(0)
+  serviceCharge Float @default(0)
   totalAmount   Float
 
   paymentType PaymentType

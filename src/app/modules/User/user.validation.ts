@@ -46,6 +46,10 @@ const createTeacher = z.object({
         address: z.string({
             required_error: "Address is required!",
         }),
+
+        designation: z.string({
+            required_error: "Designation is required!",
+        }),
     }),
 });
 const createOfficeStaff = z.object({
@@ -79,6 +83,10 @@ const createOfficeStaff = z.object({
         // ✅ ADD THESE (VERY IMPORTANT)
         dateOfBirth: z.string({
             required_error: "Date of Birth is required!",
+        }),
+        
+        designation: z.string({
+            required_error: "Designation is required!",
         }),
 
     }),
