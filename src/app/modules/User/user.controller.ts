@@ -157,8 +157,8 @@ const getAllStudents = catchAsync(async (req: Request, res: Response) => {
 
 
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
+    const { id: userId } = req.params
 
-    const userId = req.params
     const result = await userService.deleteUser(userId)
     sendResponse(res, {
         statusCode: httpStatus.OK,

@@ -177,7 +177,11 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
 
     const andCondions: Prisma.UserWhereInput[] = [];
 
-    //console.log(filterData);
+    // ✅ Always exclude DELETED users
+    andCondions.push({
+        status: { not: UserStatus.DELETED }
+    });
+
     if (params.searchTerm) {
         andCondions.push({
             OR: userSearchAbleFields.map(field => ({
@@ -186,8 +190,8 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
                     mode: 'insensitive'
                 }
             }))
-        })
-    };
+        });
+    }
 
     if (Object.keys(filterData).length > 0) {
         andCondions.push({
@@ -196,20 +200,20 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
                     equals: (filterData as any)[key]
                 }
             }))
-        })
-    };
+        });
+    }
 
-    const whereConditons: Prisma.UserWhereInput = andCondions.length > 0 ? { AND: andCondions } : {};
+    const whereConditons: Prisma.UserWhereInput = {
+        AND: andCondions  // ✅ Always has at least the DELETED filter
+    };
 
     const result = await prisma.user.findMany({
         where: whereConditons,
         skip,
         take: limit,
-        orderBy: options.sortBy && options.sortOrder ? {
-            [options.sortBy]: options.sortOrder
-        } : {
-            createdAt: 'desc'
-        },
+        orderBy: options.sortBy && options.sortOrder
+            ? { [options.sortBy]: options.sortOrder }
+            : { createdAt: 'desc' },
         select: {
             id: true,
             email: true,
@@ -227,15 +231,10 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     });
 
     return {
-        meta: {
-            page,
-            limit,
-            total
-        },
+        meta: { page, limit, total },
         data: result
     };
 };
-
 const changeProfileStatus = async (id: string, status: UserRole) => {
     const userData = await prisma.user.findUniqueOrThrow({
         where: {
@@ -392,17 +391,66 @@ const getAllStudents = async () => {
 }
 
 
-const deleteUser = async (userId: any) => {
-    const result = await prisma.user.update({
-        where: {
-            id: userId
-        },
-        data: {
-            status: "DELETED"
-        }
+const deleteUser = async (userId: string): Promise<void> => {
+    // 1. Find user and validate
+    const existingUser = await prisma.user.findUnique({
+        where: { id: userId },
     });
 
-    return result;
+    if (!existingUser) {
+        throw new Error(`User with ID "${userId}" not found.`);
+    }
+
+    if (existingUser.status === UserStatus.DELETED) {
+        throw new Error(`User with ID "${userId}" is already deleted.`);
+    }
+
+    // 2. Run everything in a transaction
+    await prisma.$transaction(async (tx) => {
+
+        // ✅ Step 1: Mark user as DELETED (blocks login)
+        await tx.user.update({
+            where: { id: userId },
+            data: { status: UserStatus.DELETED },
+        });
+
+        // ✅ Step 2: Cascade soft-delete based on role
+        switch (existingUser.role) {
+
+            case UserRole.ADMIN:
+                await tx.admin.updateMany({
+                    where: { userId },
+                    data: { isDeleted: true },
+                });
+                break;
+
+            case UserRole.TEACHER:
+                await tx.teacher.updateMany({
+                    where: { userId },
+                    data: { isDeleted: true },
+                });
+                break;
+
+            case UserRole.OFFICESTAFF:
+                await tx.officeStaff.updateMany({
+                    where: { userId },
+                    data: { isDeleted: true },
+                });
+                break;
+
+            case UserRole.STUDENT:
+                // soft-delete both student and studentAdmission
+                await tx.student.updateMany({
+                    where: { userId },
+                    data: { isDeleted: true },
+                });
+                await tx.studentAdmission.updateMany({
+                    where: { userId },
+                    data: { isDeleted: true },
+                });
+                break;
+        }
+    });
 };
 
 export const userService = {
