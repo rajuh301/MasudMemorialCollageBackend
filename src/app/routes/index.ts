@@ -17,6 +17,7 @@ import { ResultRoutes } from '../modules/Result/result.route';
 import { AccountRoutes } from '../modules/Account/account.route';
 import { LeaveRoutes } from '../modules/Leave/leave.route';
 import { GovermentBodyRoutes } from '../modules/Govermentbody/Govermentbody.route ';
+import { StudentNoticeRoutes } from '../modules/studentNotice/studentNotice.routes';
 
 
 const router = express.Router();
@@ -95,6 +96,10 @@ const moduleRoutes = [
     {
         path: '/goverment-body',
         route: GovermentBodyRoutes
+    },
+    {
+        path: '/student-notice',
+        route: StudentNoticeRoutes
     },
   
 ];

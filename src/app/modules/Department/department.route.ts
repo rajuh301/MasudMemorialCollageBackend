@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post(
   "/create-department",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.OFFICESTAFF),
   validateRequest(DepartmentValidation.createDepartmentValidation),
   DepartmentController.createDepartment
 );

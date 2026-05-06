@@ -204,7 +204,7 @@ model Department {
   name        String
   year        String
   description String
-
+ studentNotices StudentNotice[] @relation("DepartmentToStudentNotice")
   results          Result[]
   StudentAdmission StudentAdmission[]
 }
@@ -233,6 +233,7 @@ model StudentAdmission {
 
   departmentId String
   department   Department @relation(fields: [departmentId], references: [id])
+  studentNotices StudentNotice[] @relation("StudentToStudentNotice")
 
   subjects String[]
 
@@ -301,6 +302,25 @@ model Notice {
   updatedAt DateTime @updatedAt
 
   @@map("notices")
+}
+
+model StudentNotice {
+  id           String @id @default(uuid())
+
+  departmentId String
+  department   Department @relation("DepartmentToStudentNotice", fields: [departmentId], references: [id])
+
+  studentRoll  String
+
+  studentId    String
+  student      StudentAdmission @relation("StudentToStudentNotice", fields: [studentId], references: [id])
+
+  description  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("student_notices")
 }
 
 model Leave {
